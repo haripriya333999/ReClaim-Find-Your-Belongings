@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Report found item | ReClaim</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <script defer src="/js/api.js"></script>
+    <script defer src="/js/report.js"></script>
+</head>
+<body>
+    <header class="topbar">
+        <a class="brand" href="/">Re<span>Claim</span></a>
+        <nav>
+            <a href="/dashboard.html">Dashboard</a>
+            <a href="/find-items.html">Find items</a>
+            <a href="/my-reports.html">My reports</a>
+        </nav>
+    </header>
+
+    <main class="wrap page narrow fade-in">
+        <a class="back-link" href="/dashboard.html">← Dashboard</a>
+        <span class="eyebrow">FOUND ITEM REPORT</span>
+        <h1>Help an item find its owner</h1>
+        <p class="muted">Share the details of the item you found.</p>
+        
+        <form id="itemForm" class="panel form-grid" enctype="multipart/form-data">
+            <input type="hidden" name="reportType" value="FOUND">
+            <label>Item name
+                <input name="itemName" required maxlength="100" placeholder="e.g. Black backpack">
+            </label>
+            <label>Category
+                <select name="category" required>
+                    <option value="">Select category</option>
+                    <option>Electronics</option>
+                    <option>Bags</option>
+                    <option>Accessories</option>
+                    <option>Documents</option>
+                    <option>Clothing</option>
+                    <option>Keys</option>
+                    <option>Other</option>
+                </select>
+            </label>
+            <label>Colour
+                <input name="color" required maxlength="50" placeholder="e.g. Black">
+            </label>
+            <label>Date found
+                <input name="date" type="date" required>
+            </label>
+            <label class="span-two">Found location
+                <input name="location" required maxlength="200" placeholder="Where did you find it?">
+            </label>
+            <label class="span-two">Description
+                <textarea name="description" required maxlength="1000" rows="4" placeholder="Describe the item and where it was found."></textarea>
+            </label>
+            <label class="span-two">Item photograph
+                <input name="image" type="file" accept="image/png,image/jpeg,image/webp" required>
+                <small>PNG, JPG or WEBP. Maximum 5 MB.</small>
+            </label>
+            <div class="span-two">
+                <button class="btn" type="submit">Submit found report</button>
+                <p id="formMessage" class="message" aria-live="polite"></p>
+            </div>
+        </form>
+    </main>
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Dashboard | ReClaim</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <script defer src="/js/api.js"></script>
+    <script defer src="/js/dashboard.js"></script>
+</head>
+<body>
+    <header class="topbar">
+        <a class="brand" href="/">Re<span>Claim</span></a>
+        <nav>
+            <a href="/dashboard.html">Dashboard</a>
+            <a href="/find-items.html">Find items</a>
+            <a href="/my-reports.html">My reports</a>
+            <button class="link-button" id="logoutButton">Logout</button>
+        </nav>
+    </header>
+
+    <main class="wrap page fade-in">
+        <div class="page-heading">
+            <div>
+                <span class="eyebrow">YOUR SPACE</span>
+                <h1 id="welcomeTitle">Dashboard</h1>
+                <p class="muted">Report an item or browse reports shared by the community.</p>
+            </div>
+        </div>
+
+        <section class="quick-grid">
+            <a class="quick-card lost stagger-1" href="/report-lost.html">
+                <span class="quick-icon">⌕</span>
+                <h2>Report a lost item</h2>
+                <p>Tell the community what you have lost.</p>
+                <span class="card-link">Create lost report →</span>
+            </a>
+            <a class="quick-card found stagger-2" href="/report-found.html">
+                <span class="quick-icon">＋</span>
+                <h2>Report a found item</h2>
+                <p>Help someone get their belongings back.</p>
+                <span class="card-link">Create found report →</span>
+            </a>
+            <a class="quick-card browse stagger-3" href="/find-items.html">
+                <span class="quick-icon">⌕</span>
+                <h2>Find items</h2>
+                <p>Browse lost and found reports.</p>
+                <span class="card-link">Browse reports →</span>
+            </a>
+        </section>
+
+        <section class="panel stagger-4">
+            <div class="section-head">
+                <div>
+                    <h2>Your recent reports</h2>
+                    <p class="muted">Reports submitted from your account.</p>
+                </div>
+                <a href="/my-reports.html">View all →</a>
+            </div>
+            <div id="recentReports" class="item-grid">
+                <p class="muted">Loading your reports…</p>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

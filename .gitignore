@@ -1,0 +1,30 @@
+# Environment variables (CRITICAL: Do not share API keys or passwords!)
+.env
+
+# Node modules (if you are using npm later)
+node_modules/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Editor directories and files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Python Virtual Environments
+.venv/
+venv/
+env/
+ENV/
+
+# Python cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
