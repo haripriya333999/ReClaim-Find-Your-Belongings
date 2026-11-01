@@ -1,118 +1,20 @@
-# ReClaim – Find Your Belongings
+<div align="center">
+<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
+</div>
 
-## About the Project
-ReClaim is a web-based Lost and Found application that helps users report lost or found items and search for belongings reported by others.
+# Run and deploy your AI Studio app
 
-## Technologies Used
-- **Frontend:** HTML, CSS, JavaScript
-- **Backend:** Python, Flask
-- **Database:** MongoDB Atlas
-- **Tools:** VS Code, Git, GitHub
-- **Environment:** Python Virtual Environment
+This contains everything you need to run your app locally.
 
-## Project Structure
+View your app in AI Studio: https://ai.studio/apps/d35eabd2-515f-46e4-8e1e-d3d237f14bfc
 
-```text
-reclaim_project/
-│
-├── backend/
-│
-├── frontend/
-│   ├── css/
-│   │   └── style.css
-│   │
-│   ├── js/
-│   │   ├── api.js
-│   │   ├── auth.js
-│   │   ├── dashboard.js
-│   │   ├── find-items.js
-│   │   ├── my-reports.js
-│   │   └── report.js
-│   │
-│   ├── index.html
-│   ├── login.html
-│   ├── register.html
-│   ├── dashboard.html
-│   ├── find-items.html
-│   ├── my-reports.html
-│   ├── report-lost.html
-│   └── report-found.html
-│
-├── .env
-├── .gitignore
-├── requirements.txt
-├── run.py
-└── README.md
-```
+## Run Locally
 
-## How the Application is Connected
+**Prerequisites:**  Node.js
 
-1. **Frontend:** HTML is used to create web pages, CSS for styling, and JavaScript for interactions.
-2. **API Connection:** `api.js` handles communication between the frontend and backend through API requests.
-3. **Backend:** Python Flask handles API requests and application logic.
-4. **Database:** MongoDB Atlas stores user information and lost/found item reports.
-5. **Configuration:** The `.env` file stores environment variables and database connection details.
-6. **Dependencies:** `requirements.txt` contains the Python packages required to run the project.
 
-## Steps to Clone and Run the Project
-
-### 1. Clone the Repository
-
-```bash
-git clone https://github.com/haripriya333999/ReClaim-Find-Your-Belongings.git reclaim_project
-```
-
-### 2. Open the Project Folder
-
-```bash
-cd reclaim_project
-```
-
-### 3. Create a Virtual Environment
-
-```bash
-python -m venv .venv
-```
-
-### 4. Activate the Virtual Environment (Windows)
-
-```bash
-.venv\Scripts\activate
-```
-
-### 5. Install Required Packages
-
-```bash
-pip install -r requirements.txt
-```
-
-### 6. Configure Environment Variables
-
-Create a `.env` file in the root directory and add the required configuration, including your MongoDB Atlas connection details.
-
-### 7. Run the Application
-
-```bash
-python run.py
-```
-
-## Current Implementation
-
-- User registration and login
-- Dashboard
-- Lost item reporting
-- Found item reporting
-- Item searching and filtering
-- Viewing personal reports
-- MongoDB Atlas integration
-
-## Important Notes
-
-- Python must be installed before setting up the project.
-- Each person should create their own virtual environment.
-- The `.env` file should be configured locally and should not contain publicly shared credentials.
-- The `.venv` folder and sensitive environment files should not be uploaded to GitHub.
-
-## Project Status
-
-The basic application structure, frontend and backend integration, user authentication, item reporting, searching, and database connectivity have been implemented. This README will be updated as the project progresses.
+1. Install dependencies:
+   `npm install`
+2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
+3. Run the app:
+   `npm run dev`

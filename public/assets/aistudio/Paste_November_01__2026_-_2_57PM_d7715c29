@@ -1,0 +1,1841 @@
+bro in here i am memebner -2 ("BROOOOO! ❤️ Now let's divide ReClaim – Find Your Belongings exactly like the SEP team division, but make sure all three members get a fair amount of work.
+
+I went through your eight-screen prototype and the complete project workflow again.
+
+My recommendation is to divide ReClaim into three independent full-stack modules, where each member handles their own frontend, backend, database operations and testing.
+
+Most importantly, nobody should get stuck doing only frontend, only documentation, or all the difficult backend work.
+
+# ReClaim – Equal 3-member work division
+
+# ReClaim
+
+Find Your Belongings · Design Thinking & Innovation
+
+# 01
+
+Reporting
+
+# 02
+
+Matching
+
+# 03
+
+Recovery
+
+## One application · Three owners · Equal responsibility
+
+## 1. Member 1 – Item Reporting & Management
+
+Module 1
+
+Responsibility: Develop the complete lost-and-found item reporting system.
+
+This member handles the process of adding belongings to ReClaim and managing the submitted reports.
+
+Features to develop
+
+1. Report Lost Item form.
+2. Report Found Item form.
+3. Item name and category selection.
+4. Item photograph upload.
+5. Last-seen or found location.
+6. Date and time selection.
+7. Item description.
+8. Edit and manage submitted reports.
+9. View personal lost and found report listings.
+10. Search and filter submitted reports.
+
+Frontend responsibilities
+
+- Report Lost Item screen.
+- Report Found Item screen.
+- Item details form.
+- Photo upload interface.
+- Personal report listing.
+
+Backend responsibilities
+
+- Create lost-item reports.
+- Create found-item reports.
+- Store item information in the database.
+- Handle photograph storage references.
+- Validate submitted information.
+- Update or close reports.
+- Retrieve reports belonging to the logged-in user.
+
+Expected result
+
+A user should be able to report something they lost or found, upload its details and photograph, and manage their submissions.
+
+Prototype responsibility: Screen 3 (including Found Item reporting) and the report-listing part of Screen 8.
+
+## 2. Member 2 – Smart Matching & Item Discovery
+
+Module 2
+
+Responsibility: Develop the system that identifies potentially matching lost and found belongings.
+
+This member handles the discovery process that connects matching reports.
+
+Features to develop
+
+1. View possible matches.
+2. Search lost and found items.
+3. Compare item names.
+4. Compare item categories.
+5. Compare item colours.
+6. Compare item descriptions.
+7. Compare lost and found locations.
+8. Compare dates and times.
+9. Calculate a matching score.
+10. Display matching results in descending order of relevance.
+11. Filter matches by category and location.
+12. Generate match notifications.
+
+Frontend responsibilities
+
+- View Matches screen.
+- Possible Matches listing.
+- Matching percentage display.
+- Search and filter interface.
+- Match details view.
+- Match notifications.
+
+Backend responsibilities
+
+- Retrieve relevant lost and found reports.
+- Implement matching logic.
+- Calculate similarity scores.
+- Exclude closed or reclaimed reports from active matching.
+- Store or retrieve match records.
+- Generate notifications when suitable matches are identified.
+
+Expected result
+
+When someone reports a lost backpack and another person reports finding a similar backpack, ReClaim should identify the potential match and notify the relevant user.
+
+Prototype responsibility: Screen 4 (View Matches) and matching-related notifications.
+
+Important technical point: Start with a rule-based matching algorithm using category, colour, description, location and date. Image similarity or AI-based matching can be added later only if implemented and tested.
+
+## 3. Member 3 – Ownership Verification & Item Recovery
+
+Module 3
+
+Responsibility: Develop the complete process that helps the rightful owner recover their belongings.
+
+This member handles what happens after a possible match has been identified.
+
+Features to develop
+
+1. Ownership verification form.
+2. Custom questions about unique item characteristics.
+3. Submit ownership verification answers.
+4. Review verification results.
+5. Accept or reject a recovery request.
+6. Connect with the finder.
+7. Send and receive connection requests.
+8. Coordinate item pickup.
+9. Confirm successful item return.
+10. Update report status to Reclaimed.
+11. Display recovery confirmation.
+12. Track the recovery status and history.
+
+Frontend responsibilities
+
+- Verification Process screen.
+- Connect with Finder screen.
+- Recovery confirmation screen.
+- Recovery status and tracking interface.
+
+Backend responsibilities
+
+- Store private ownership-verification information.
+- Handle verification submissions.
+- Manage claim and connection requests.
+- Store pickup coordination details.
+- Manage recovery status transitions.
+- Record successful handovers.
+- Maintain recovery history.
+
+Expected result
+
+A user should be able to verify ownership, connect with the finder, arrange collection and confirm that the lost item has been successfully returned.
+
+Prototype responsibility: Screens 5, 6 and 7, plus the status-tracking part of Screen 8.
+
+# 4. How do we divide the remaining common screens?
+
+There are two screens that should not become the burden of one member.
+
+| Prototype screen       | Responsibility      |
+| ---------------------- | ------------------- |
+| 1. Login / Signup      | Shared foundation   |
+| 2. Home / Dashboard    | Shared foundation   |
+| 3. Report Lost Item    | Member 1            |
+| Report Found Item      | Member 1            |
+| 4. View Matches        | Member 2            |
+| 5. Verification        | Member 3            |
+| 6. Connect with Finder | Member 3            |
+| 7. Item Reclaimed      | Member 3            |
+| 8. My Reports          | Member 1 + Member 3 |
+
+How should the common screens work?
+
+- Login / Signup: all three reuse the same authentication system. If it has to be built, divide the initial setup collectively.
+- Dashboard: one shared interface connecting all three modules. Each member supplies their own feature entry and functionality.
+- My Reports: Member 1 provides the lost/found report listing; Member 3 provides recovery statuses and history.
+
+This avoids duplicate work.
+
+# 5. Workload comparison
+
+I want all three members to have comparable responsibilities, not just an equal number of screens.
+
+| Work category | Member 1          | Member 2           | Member 3                  |
+| ------------- | ----------------- | ------------------ | ------------------------- |
+| Frontend      | Yes               | Yes                | Yes                       |
+| Backend       | Yes               | Yes                | Yes                       |
+| Database      | Yes               | Yes                | Yes                       |
+| Main logic    | Report management | Matching algorithm | Verification and recovery |
+| Testing       | Yes               | Yes                | Yes                       |
+| Documentation | Shared            | Shared             | Shared                    |
+
+Target workload distribution
+
+Member 1 – Reporting
+
+33.3%
+
+Member 2 – Matching
+
+33.3%
+
+Member 3 – Recovery
+
+33.3%
+
+These are target responsibility shares, not measured development hours. Adjust based on actual implementation complexity.
+
+# 6. How should the three members work together?
+
+Even though everyone owns a separate module, the application must work as one system.
+
+The workflow should be:
+
+Member 1
+
+Creates lost and found reports
+
+Member 2
+
+Identifies potential matches
+
+Member 3
+
+Verifies ownership and coordinates recovery
+
+All three modules integrated
+
+Item successfully reclaimed
+
+## 7. Important rules to prevent workload problems
+
+I recommend following these rules:
+
+1. Each member must complete both frontend and backend for their module.
+2. Nobody should modify another member's module without coordination.
+3. All three must use the same database and common item-report structure.
+4. Agree on API endpoints and data formats before development.
+5. Each member must test their own module before integration.
+6. No one should be assigned all the documentation or testing.
+7. Integration testing should be performed by all three members.
+8. If one member's module becomes significantly more difficult, redistribute smaller tasks rather than leaving that person overloaded.
+
+One important technical detail: Member 2 depends on the item records created by Member 1, and Member 3 depends on matches produced by Member 2. So agree on the shared data structure and API contracts early. This allows everyone to develop using sample data without waiting for the previous member to finish.
+
+# 8. What we should actually implement (without unnecessary complexity)
+
+To keep ReClaim achievable as a DTI project, I recommend this scope:
+
+| Feature                | Realistic initial implementation           |
+| ---------------------- | ------------------------------------------ |
+| Lost/found reporting   | Functional forms with database storage     |
+| Photo upload           | Actual image upload                        |
+| Matching               | Rule-based similarity scoring              |
+| Matching percentage    | Calculated from implemented criteria       |
+| Ownership verification | Private details and manual verification    |
+| Finder connection      | Connection request and pickup coordination |
+| Messaging              | Simple in-app messaging if time permits    |
+| Notifications          | In-app match and status notifications      |
+| Recovery               | Confirmation and status updates            |
+| Tracking               | Actual report and recovery history         |
+
+We should not claim that the app uses AI image recognition, automatically proves ownership, or guarantees item recovery unless those capabilities are genuinely implemented.
+
+# 9. Final task allocation to share with your teammates
+
+This is the division I recommend finalizing.
+
+## ReClaim – Team Responsibilities
+
+Member 1: Item Reporting & Management
+
+- Lost and Found reporting
+- Photo upload and item details
+- Search and filtering of reports
+- Edit and manage reports
+- Personal report listings
+
+Member 2: Smart Matching & Item Discovery
+
+- Lost/found item comparison
+- Matching algorithm
+- Similarity score calculation
+- Possible matches screen
+- Match search and filters
+- Match notifications
+
+Member 3: Ownership Verification & Recovery
+
+- Ownership verification
+- Claim requests
+- Finder connection
+- Pickup coordination
+- Recovery confirmation
+- Status tracking and history
+
+Shared by all three
+
+- Login/signup integration
+- Dashboard integration
+- Common UI and design consistency
+- Database and API coordination
+- User research and DTI documentation
+- Final testing and presentation
+
+## My final recommendation, bro ❤️
+
+I would keep this division rather than assigning Member 1 all the frontend, Member 2 all the backend and Member 3 all the database work.
+
+Why?
+
+Because each person will be able to confidently explain:
+
+- What problem their module solves.
+- Why their feature is needed.
+- How their frontend works.
+- How their backend processes information.
+- How their database stores the information.
+- How they tested their functionality.
+
+And all three will have a genuine technical contribution to ReClaim.
+
+The goal is that if any one member presents their module independently, it should be a complete, working contribution to the same ReClaim application.
+
+I can also turn these three allocations into separate, detailed development instructions for each member, similar to your Meghana, Varuna and Yamuna instructions for SEP.") do add all of these BROOO! ❤️ Now I'll give you your complete Member 2 responsibility document for ReClaim – Find Your Belongings.
+
+This is the full description of what you are expected to develop, from the beginning until final integration. You can use it as your personal development roadmap.
+
+# ReClaim – Member 2: Smart Matching, Item Discovery & Notifications
+
+[Lost & Found Items App Concept by Damian Kubisiak on Dribbble](https://images.openai.com/static-rsc-4/iVFipOtcpDYA65xDo5MTMRGQxuDb9UIwMPR3LH8swxsN3-Jp_F4esCNN07H5mqlqBNLQDi33mQegfO8JrbZhtsog4oCQq_vqtBkb7hW8La9jcrVAM9Xc8yEjd-ujzKBs89gASA_Ggr5TSwZC4Mr3c0YbxoBONmDrR77MxFnKl08?purpose=inline)
+
+[dribbble.com](https://dribbble.com/shots/20833993-Lost-Found-Items-App-Concept?utm_source=chatgpt.com)
+
+# Your module: Smart Matching & Item Discovery
+
+Main responsibility: Develop a system that automatically identifies potentially matching Lost and Found reports, connects those reports, and notifies the original owner when a possible match is discovered.
+
+## 1. Understanding your role
+
+ReClaim has three main modules:
+
+| Member         | Responsibility                                 |
+| -------------- | ---------------------------------------------- |
+| Member 1       | Item Reporting & Management                    |
+| Member 2 – You | Smart Matching, Item Discovery & Notifications |
+| Member 3       | Ownership Verification & Item Recovery         |
+
+Member 1 allows users to report lost and found belongings.
+
+Your responsibility starts when those reports are stored in the database.
+
+You must develop the functionality that identifies whether a found item could be the same as an item someone reported losing.
+
+For example:
+
+- User A reports losing a black wallet near the college library.
+- User B reports finding a black wallet near the college library.
+- Your system compares both reports.
+- It calculates a matching score.
+- It creates a possible match.
+- User A receives a notification.
+- User A can open the possible match and proceed to ownership verification through Member 3's module.
+
+Your goal is to make ReClaim actively connect owners and finders rather than simply allowing users to browse reports.
+
+# 2. Complete features you must develop
+
+Your work consists of seven major components.
+
+## Module A – Lost and Found Data Retrieval
+
+Backend integration
+
+First, you must connect your module to Member 1's existing reporting system.
+
+The uploaded project uses:
+
+- Python Flask backend.
+- MongoDB database.
+- HTML, CSS and JavaScript frontend.
+- JWT authentication.
+
+Member 1 already has an `items` collection.
+
+You must retrieve the existing reports instead of creating another item collection.
+
+Existing API documented in the uploaded code:
+
+`GET /api/items?status=OPEN`
+
+Use the existing authentication mechanism and API helper.
+
+You must retrieve the following information:
+
+| Field         | Purpose                      |
+| ------------- | ---------------------------- |
+| `_id`         | Unique item identifier       |
+| `userId`      | Person who reported the item |
+| `reportType`  | LOST or FOUND                |
+| `itemName`    | Item name                    |
+| `category`    | Item category                |
+| `description` | Item description             |
+| `color`       | Item colour                  |
+| `location`    | Lost or found location       |
+| `date`        | Incident date                |
+| `imageId`     | Item photograph reference    |
+| `status`      | Current report status        |
+
+Your responsibilities:
+
+1. Retrieve active Lost reports.
+2. Retrieve active Found reports.
+3. Separate them according to report type.
+4. Validate that the required information is available.
+5. Pass the reports to your matching algorithm.
+6. Respect authentication and user permissions.
+
+Expected result: Your module can access the actual item reports submitted by users.
+
+## Module B – Smart Matching Algorithm
+
+Core backend functionality
+
+This is the most important technical component of your work.
+
+You must develop an algorithm that compares Lost and Found reports and identifies possible matches.
+
+### B1. Compare item names
+
+Example:
+
+- Lost: Black wallet.
+- Found: Wallet.
+
+The system should recognize that both reports may refer to the same type of item.
+
+You should handle differences in uppercase/lowercase, extra spaces and common wording.
+
+### B2. Compare item categories
+
+Example:
+
+- Lost category: Accessories.
+- Found category: Accessories.
+
+Matching categories should increase the score.
+
+### B3. Compare colours
+
+Example:
+
+- Lost colour: Dark blue.
+- Found colour: Navy blue.
+
+You can initially use normalized colour comparisons and carefully defined equivalent terms.
+
+### B4. Compare descriptions
+
+Example:
+
+Lost description:
+
+"Black leather wallet with a small silver button."
+
+Found description:
+
+"Leather wallet, black colour, silver button."
+
+Your algorithm should identify similarities between these descriptions.
+
+Start with text normalization and keyword-based comparison. More advanced NLP can be added if time permits.
+
+### B5. Compare locations
+
+Example:
+
+- Lost location: College library.
+- Found location: Near college library.
+
+You should identify whether the locations are the same or reasonably close.
+
+Do not treat two unrelated locations as a match simply because their text looks similar.
+
+### B6. Compare dates and times
+
+Example:
+
+- Lost date: October 30.
+- Found date: October 31.
+
+A nearby date should generally contribute more to the matching score than a very distant date.
+
+### B7. Calculate matching scores
+
+You can begin with this proposed scoring model:
+
+| Matching criterion | Weight |
+| ------------------ | ------ |
+| Item name          | 20%    |
+| Category           | 15%    |
+| Colour             | 15%    |
+| Description        | 20%    |
+| Location           | 20%    |
+| Date               | 10%    |
+| Total              | 100%   |
+
+The score is calculated using the similarity of each criterion.
+
+For example:
+
+Example matching calculation
+
+# 92%
+
+Illustrative score, not a live repository result.
+
+| Criterion   | Example contribution |
+| ----------- | -------------------- |
+| Name        | 20/20                |
+| Category    | 15/15                |
+| Colour      | 15/15                |
+| Description | 17/20                |
+| Location    | 17/20                |
+| Date        | 8/10                 |
+| Total       | 92/100               |
+
+You must test the weights and thresholds using realistic examples. Do not assume that 92% proves the owner owns the item.
+
+### B8. Matching rules
+
+Your algorithm must:
+
+- Compare LOST reports against FOUND reports only.
+- Avoid matching reports submitted by the same user.
+- Ignore CLOSED reports.
+- Ignore RECLAIMED reports.
+- Avoid generating duplicate matches.
+- Rank results by matching score.
+- Allow qualifying matches to be retrieved later.
+
+Expected result: The system automatically identifies and ranks potentially matching belongings.
+
+## Module C – Automatic Match Detection
+
+Essential integration
+
+Your matching algorithm must not depend on users manually clicking a Match button.
+
+It should run automatically when a new report is created.
+
+There are two important scenarios.
+
+Scenario 1: Someone reports finding an item.
+
+1. Member 1 saves a new Found report.
+2. Your matching service is triggered.
+3. It retrieves active Lost reports.
+4. It compares the new Found report against those Lost reports.
+5. It identifies qualifying matches.
+6. It saves match records.
+7. It creates notifications for the relevant owners.
+
+Scenario 2: Someone reports losing an item.
+
+1. Member 1 saves a new Lost report.
+2. Your matching service is triggered.
+3. It retrieves existing active Found reports.
+4. It compares the new Lost report against those Found reports.
+5. It identifies qualifying matches.
+6. It saves match records.
+7. It creates notifications for the relevant owners.
+
+Both directions are necessary.
+
+Otherwise, a person who reports an item lost after someone else has already reported finding it might never receive a notification.
+
+You must coordinate with Member 1 to trigger your matching service after their report is successfully saved in MongoDB.
+
+Expected result: Newly submitted reports are automatically checked against relevant existing reports.
+
+## Module D – View Matches & Item Discovery Interface
+
+Frontend development
+
+You must develop a dedicated page where users can see possible matches for their lost belongings.
+
+Suggested page name:
+
+`view-matches.html`
+
+### D1. Possible Matches
+
+Display matching reports in an organized card layout.
+
+Each card should include:
+
+- Item photograph, if available.
+- Item name.
+- Category.
+- Colour.
+- Location.
+- Found date.
+- Matching percentage.
+- Match status.
+- View Details action.
+
+Example:
+
+Possible matches
+
+Example
+
+[Wallets  – DIAZ](https://images.openai.com/static-rsc-4/HafwjViMxLbcoTNXgAcNxz_VbInz22ViQNeAKnkKO7B_5WMagv6JXWvUuNuhBoqFcs5xksxocOHjjdxvVwBCocmYAqHKN9P2Zgh3rB8Ckqn_Sb2-sCrYnllVB4vYsfIf_eYg0sujdgVqDdn3kw97jxIbAaKPXvHABFlBXbdtHwc?purpose=inline)
+
+Black leather wallet
+
+Accessories · Black
+
+# 92%
+
+Possible match
+
+Found near College Library
+
+View match details →
+
+### D2. Search functionality
+
+Users should be able to search for possible matches using:
+
+- Item name.
+- Item category.
+- Location.
+- Colour.
+
+### D3. Filtering functionality
+
+Add filters for:
+
+- Category.
+- Location.
+- Matching score range.
+- Match status.
+
+### D4. Match details page
+
+When a user selects a possible match, show relevant details of the Lost and Found reports.
+
+Be careful not to expose private verification information or unnecessary personal details.
+
+Expected result: Users can easily discover, search and inspect possible matches.
+
+## Module E – Match Database Management
+
+MongoDB integration
+
+You must create and manage a separate `matches` collection.
+
+This collection stores relationships between existing Lost and Found reports.
+
+Proposed document structure:
+
+```
+{    "lostItemId": lost_item_id,    "foundItemId": found_item_id,    "ownerId": owner_id,    "finderId": finder_id,    "score": 92,    "status": "PENDING",    "createdAt": datetime.now(timezone.utc)}
+```
+
+Your responsibilities:
+
+1. Store each detected match.
+2. Link it to the original Lost report.
+3. Link it to the corresponding Found report.
+4. Store the matching score.
+5. Store the owner and finder IDs.
+6. Maintain the match status.
+7. Prevent duplicate Lost–Found pairs.
+8. Retrieve matches for the relevant logged-in user.
+9. Update match status when the recovery process changes.
+
+Suggested match statuses:
+
+- `PENDING`
+- `CLAIM_IN_PROGRESS`
+- `VERIFIED`
+- `REJECTED`
+- `CLOSED`
+- `RECLAIMED`
+
+These statuses must be finalized with Member 3 so both modules use the same values.
+
+Expected result: Every potential match is stored and can be accessed by the relevant users and modules.
+
+## Module F – Automatic In-App Notifications
+
+Essential user-facing functionality
+
+This is another major part of your responsibility.
+
+Whenever a possible match is detected, the original owner should receive an in-app notification.
+
+### F1. Create a notifications collection
+
+Proposed structure:
+
+```
+{    "userId": owner_id,    "matchId": match_id,    "title": "Possible match found!",    "message": (        "A found item may match "        "your lost black wallet."    ),    "isRead": False,    "createdAt": datetime.now(timezone.utc)}
+```
+
+### F2. Notification workflow
+
+Imagine:
+
+- A person reports losing a black backpack.
+- Another person reports finding a similar backpack.
+- Your matching algorithm detects a possible match.
+- Your backend creates a notification for the original owner.
+
+The owner sees:
+
+Notifications
+
+New
+
+Possible match found!
+
+A found item may match your lost black backpack.
+
+Near College Library
+
+View possible match →
+
+### F3. Notification features
+
+You must implement:
+
+1. Automatic notification creation.
+2. Notifications linked to the correct owner.
+3. Notification retrieval for the logged-in user.
+4. Unread notification count.
+5. Mark notification as read.
+6. Link notification to its match details.
+7. Prevent duplicate notifications for the same match.
+8. Ensure users cannot access other users' notifications.
+
+### F4. Notification API endpoints
+
+Proposed APIs:
+
+| Method | Endpoint                       | Function                  |
+| ------ | ------------------------------ | ------------------------- |
+| GET    | `/api/notifications`           | Retrieve notifications    |
+| PATCH  | `/api/notifications/<id>/read` | Mark as read              |
+| GET    | `/api/matches`                 | Retrieve possible matches |
+| GET    | `/api/matches/<id>`            | Retrieve one match        |
+
+All endpoints should use the existing JWT authentication system.
+
+Expected result: The original owner receives an in-app notification whenever a qualifying potential match is discovered.
+
+Email, SMS and push notifications are optional future enhancements. Your required initial implementation is in-app notifications.
+
+## Module G – Match Status & Recovery Integration
+
+Coordination with Member 3
+
+Your module must remain connected to Member 3's ownership verification and recovery module.
+
+The workflow is:
+
+1. Your matching system identifies a possible match.
+2. Your module stores the match.
+3. The owner receives a notification.
+4. The owner opens the match.
+5. Member 3 handles the ownership verification.
+6. Member 3 updates the claim and recovery status.
+7. Your matching module reflects the updated status.
+8. Reclaimed items are no longer shown as active possible matches.
+
+You need to coordinate the following shared data:
+
+| Data          | Why it matters                 |
+| ------------- | ------------------------------ |
+| `matchId`     | Identifies the match           |
+| `lostItemId`  | Identifies the owner's report  |
+| `foundItemId` | Identifies the finder's report |
+| `ownerId`     | Identifies the owner           |
+| `finderId`    | Identifies the finder          |
+| `score`       | Shows similarity               |
+| `status`      | Tracks match progress          |
+
+Member 3 must not create a separate match record for the same pair of reports.
+
+Expected result: Your module and Member 3's module work together throughout the recovery process.
+
+# 3. Your complete backend responsibilities
+
+You will be responsible for implementing the following backend functionality.
+
+| Backend component                | Responsibility                              |
+| -------------------------------- | ------------------------------------------- |
+| `matching.py`                    | Matching and scoring algorithm              |
+| `matching_routes.py`             | Match retrieval and details APIs            |
+| `notification_routes.py`         | Notification retrieval and read-status APIs |
+| Match database operations        | Create, retrieve and update matches         |
+| Notification database operations | Create and retrieve notifications           |
+| Matching trigger                 | Run after new Lost/Found report creation    |
+| Authentication                   | Reuse existing JWT protection               |
+| Authorization                    | Restrict records to relevant users          |
+| Status handling                  | Exclude inactive and reclaimed items        |
+
+These are proposed file names. Coordinate with Member 1 before changing the existing `backend/app.py` or shared initialization files.
+
+# 4. Your complete frontend responsibilities
+
+You will also develop the frontend of your module.
+
+| Frontend component     | Responsibility                           |
+| ---------------------- | ---------------------------------------- |
+| View Matches           | Display possible matches                 |
+| Match cards            | Show item details and scores             |
+| Match details          | Show relevant Lost and Found information |
+| Search                 | Search possible matches                  |
+| Filters                | Filter by category, location and score   |
+| Notifications          | Display notifications                    |
+| Notification indicator | Show unread count                        |
+| Notification actions   | Open matches and mark as read            |
+
+You must integrate these pages into the existing ReClaim interface and reuse its navigation, design, authentication and API helpers.
+
+# 5. Exact division of integration responsibilities
+
+Although your module is independent, three integrations are necessary.
+
+| Integration         | Your responsibility                                 |
+| ------------------- | --------------------------------------------------- |
+| Member 1 → Member 2 | Retrieve reports and trigger matching               |
+| Member 2 → Member 3 | Supply match records and match IDs                  |
+| Member 3 → Member 2 | Reflect verification, rejection and recovery status |
+
+You should discuss these integrations with your teammates before changing shared files.
+
+# 6. Your development roadmap
+
+This is the order I recommend you follow.
+
+## Your implementation phases
+
+1. Phase 1 – Understand and connect
+   - Understand Member 1's Flask APIs.
+   - Understand the MongoDB `items` collection.
+   - Retrieve Lost and Found reports.
+   - Test authentication and data access.
+2. Phase 2 – Develop matching logic
+   - Normalize item details.
+   - Compare six criteria.
+   - Calculate matching scores.
+   - Rank possible matches.
+   - Test matching accuracy.
+3. Phase 3 – Save and manage matches
+   - Create the `matches` collection.
+   - Store match records.
+   - Prevent duplicate matches.
+   - Implement retrieval APIs.
+4. Phase 4 – Automate matching
+   - Trigger matching after new Lost reports.
+   - Trigger matching after new Found reports.
+   - Compare against existing opposite reports.
+   - Handle status changes.
+5. Phase 5 – Develop frontend
+   - Create View Matches.
+   - Create match cards.
+   - Add search and filters.
+   - Create match details.
+6. Phase 6 – Develop notifications
+   - Create notification storage.
+   - Automatically notify owners.
+   - Build notifications interface.
+   - Add read/unread functionality.
+7. Phase 7 – Integrate and test
+   - Connect Member 3's verification workflow.
+   - Test the entire user journey.
+   - Fix integration bugs.
+   - Submit your Pull Request.
+
+# 7. Complete testing requirements
+
+You must demonstrate that your module works in realistic situations.
+
+| Test case                                 | Expected result                    |
+| ----------------------------------------- | ---------------------------------- |
+| Black wallet lost and black wallet found  | Possible match                     |
+| New found item matches old lost item      | Owner notified                     |
+| New lost item matches old found item      | Owner notified                     |
+| Same category but different item          | Low score                          |
+| Similar description, different location   | Lower score                        |
+| Same user reports both records            | No self-match                      |
+| Closed report                             | Excluded                           |
+| Reclaimed report                          | Excluded                           |
+| Same pair checked again                   | No duplicate match or notification |
+| User accesses another user's notification | Access denied                      |
+| Owner opens a match                       | Relevant match details displayed   |
+| Member 3 verifies ownership               | Match status updated               |
+| Item is reclaimed                         | No longer active                   |
+
+# 8. What you should NOT do
+
+To prevent unnecessary work and integration problems:
+
+- Don't create a second login or signup system.
+- Don't create a second MongoDB database.
+- Don't duplicate Member 1's Lost and Found reporting forms.
+- Don't replace the existing Flask backend with another framework.
+- Don't independently change shared authentication files.
+- Don't expose private ownership verification details.
+- Don't claim that a matching percentage guarantees ownership.
+- Don't implement AI image recognition unless you actually build and test it.
+- Don't merge unfinished code directly into `main`.
+
+Use your own Git branch:
+
+`member2-matching`
+
+Develop your work there and submit a Pull Request when ready.
+
+# 9. Your final deliverables
+
+By the end of your work, you should be able to demonstrate all of the following:
+
+## Member 2 – Final deliverables
+
+- Functional matching algorithm.
+- Item name and category comparison.
+- Colour and description comparison.
+- Location and date comparison.
+- Matching percentage calculation.
+- Ranked possible matches.
+- MongoDB match records.
+- Automatic matching in both directions.
+- View Matches frontend page.
+- Match details interface.
+- Search and filter functionality.
+- Automatic owner notifications.
+- MongoDB notifications collection.
+- Notifications frontend page.
+- Unread notification count.
+- Mark-as-read functionality.
+- Duplicate prevention.
+- Match status integration with Member 3.
+- Authentication and authorization.
+- Complete integration testing.
+
+## 10. How you should explain your contribution during the DTI presentation
+
+You can describe your module like this:
+
+**Member 2 – Smart Matching & Item Discovery**
+
+My responsibility in the ReClaim project is to develop the Smart Matching and Item Discovery module, which connects users who have reported losing belongings with users who have reported finding potentially matching items.
+
+The module retrieves Lost and Found reports from the shared MongoDB database through the existing Flask backend. It compares item names, categories, colours, descriptions, locations and dates using a rule-based matching algorithm.
+
+Based on these comparisons, the system calculates similarity scores, ranks potential matches and displays them through a dedicated View Matches interface. Users can explore, search and filter the matching results.
+
+An important functionality of my module is automatic match detection and in-app notifications. Whenever a new Lost or Found report is submitted, the system checks for potential matches in the opposite report category. When a qualifying match is identified, it stores the match and sends an in-app notification to the original owner.
+
+The module also maintains match records, prevents duplicate matches, handles inactive reports and integrates with the Ownership Verification and Recovery module.
+
+The overall objective is to reduce the effort required to find lost belongings by automatically identifying potential matches and notifying the relevant users.
+
+## 11. Your immediate next steps
+
+Before starting development, finalize these points with your teammates:
+
+1. With Member 1: Agree on how the matching function will be triggered after an item is saved.
+2. With Member 3: Agree on the match document structure and status values.
+3. With both: Agree on the `matches` and `notifications` collections.
+4. Create your `member2-matching` branch.
+5. Begin with report retrieval and matching logic.
+
+One final distinction: Your module identifies possible matches and notifies owners. Member 3 verifies whether the person is the rightful owner. Keeping those responsibilities separate is important for both security and a correct project workflow.
+
+Your overall contribution is a complete full-stack module: Flask backend + MongoDB + matching logic + frontend + automatic notifications + integration + testing. ❤️ Brooo 😭 okay, now I understand what you're asking.
+
+You don't want code or commands. You want to understand the entire process of how your Member 2 work connects with Member 1's work, how both of you cooperate, what happens inside the application, what information passes between you, and what you are personally responsible for.
+
+Let's start from zero. Imagine you and Member 1 are sitting together and developing ReClaim.
+
+# 1. First, understand what Member 1 and Member 2 are actually building
+
+Your ReClaim application has one main purpose:
+
+Help people find their lost belongings by connecting people who lost items with people who found items.
+
+To achieve that, two things must happen:
+
+1. Someone must report a lost or found item.
+2. The application must identify whether a Lost report matches a Found report.
+
+These are your two responsibilities.
+
+## The relationship between your modules
+
+Member 1
+
+Reporting
+
+[Platform | Faundit](https://images.openai.com/static-rsc-4/E6O-p9GbSXDGpoG6ZsIGpFp7gWtZM00ZczaYa1qebhSS4OoY5gp5_M-4i84z6GHqzxlomOn2Ic1hGGUiTq4pCwVEKMKcygZJfGxdk2pQeQn5CNUC0IO2SxyKybYHF3CqPp-FI-jDCAATS4XFqys7pADBUdEZ9JpcijecyKejfVk?purpose=inline)
+
+[faundit.com](https://faundit.com/how-it-works?utm_source=chatgpt.com)
+
+Collects information from users and registers Lost and Found items.
+
+- What item?
+- What colour?
+- Where was it lost or found?
+- When?
+- Description and photograph?
+
+Registered item information is shared
+
+Member 2 – YOU
+
+Smart Matching
+
+[FoundIt | مستقل](https://images.openai.com/static-rsc-4/wUju-mvi2Ng05Qe4orxU9iQU8LDuxSCFt9I-K-FQPXYDXJvYnNyN6rJCoLIIC5MLH1ATA5eUNd8I-D807Coq755tdFBMRBq5IWs9EV1tTMToAdZY9_d6YvLfWQyD2ibsQiacC08NtvPVXISvS2VENP28m75nldDnc66zFCGtGYQ?purpose=inline)
+
+[mostaql.com](https://mostaql.com/portfolio/2740748-foundit?utm_source=chatgpt.com)
+
+Uses the registered information to find possible matches.
+
+- Compares Lost and Found reports.
+- Calculates similarity.
+- Ranks possible matches.
+- Displays matches.
+- Notifies the relevant owner.
+
+Think of Member 1 as the person collecting information and you as the person intelligently using that information.
+
+Neither feature is useful without the other.
+
+# 2. Let's understand the complete situation with a real example
+
+Imagine three people:
+
+- Ananya loses her black wallet.
+- Rahul finds a black wallet.
+- Both are using your ReClaim application.
+
+Let's see what happens.
+
+## Stage 1: Ananya reports her Lost item – Member 1's responsibility
+
+Ananya opens ReClaim.
+
+She logs into her account and selects Report Lost Item.
+
+She enters:
+
+| Information | Her answer                                    |
+| ----------- | --------------------------------------------- |
+| Item name   | Wallet                                        |
+| Category    | Accessories                                   |
+| Colour      | Black                                         |
+| Description | Black leather wallet with a small silver logo |
+| Location    | MVP Colony                                    |
+| Date        | October 30                                    |
+| Photograph  | Wallet photograph                             |
+
+She submits the form.
+
+What happens now?
+
+Member 1's reporting functionality receives this information and stores it in the application's database.
+
+The database is essentially the application's storage place.
+
+Think of it as a digital register containing all the Lost and Found reports submitted by users.
+
+Ananya's report is now saved.
+
+Digital item register
+
+[루이까또즈 소프트 레더 바이폴드 지갑 블랙 정품 안심 거래 | KREAM](https://images.openai.com/static-rsc-4/LaVe5aNQCJgaTY-f7hMXZF5YflKuRTmzUM9XcKbR86bBvyn2wLnoYnvxNDxWJ-zNnye8IP8392JUZ1zDSNqnPqKdEwVVFfSnJqZqdzO5G2S7_CM16UKVn9MQGdX6ELrfa01txdOhQykWtED3La8poLemd8OWfqr_oq_v3n_uMXg?purpose=inline)
+
+Black Wallet
+
+Reported by Ananya
+
+LOST – OPEN
+
+The report is now available for your matching feature to examine.
+
+At this point, Member 1's responsibility for registering this report is complete.
+
+But your matching feature has not necessarily found anything yet. There may be no Found report available.
+
+That's where your work begins.
+
+## Stage 2: Rahul reports a Found item – Member 1 again
+
+Later, Rahul finds a black wallet near MVP Colony.
+
+He opens ReClaim and selects Report Found Item.
+
+He submits:
+
+| Information | His answer                      |
+| ----------- | ------------------------------- |
+| Item name   | Wallet                          |
+| Category    | Accessories                     |
+| Colour      | Black                           |
+| Description | Black wallet with a silver logo |
+| Location    | Near MVP Colony                 |
+| Date        | October 30                      |
+| Photograph  | Wallet photograph               |
+
+Member 1 receives this report and saves it in the same database.
+
+Now the database contains two separate records:
+
+LOST REPORT
+
+[Heritage Black Leather Wallet | Timepieces International](https://images.openai.com/static-rsc-4/2NkFgjUrw8b-fA3xjWrLa2IM7ZlDMANwZUPfWxJBBeL7u4dPoxUfQTr0XkP-ISZJtjGsr7kjtIP8Y8ek66hoT2dV_cPaqNGZeIOu8NeJx4_3l2ht2bO7QYTWzA3-xica1UJu6X6gbINa7G4Nf4TgH8LSr4Lc3_yFXythV7fw840?purpose=inline)
+
+Black Wallet
+
+Ananya · MVP Colony
+
+October 30
+
+FOUND REPORT
+
+[Malcolm | Shrunken Calf | Noir  – PEGAI](https://images.openai.com/static-rsc-4/CIAcu0DXWHDLBHDH51G2M_a40Q5BuUmdoeg2hPLMgWzP-xJ1PrlScLk3aiUrQvZ042FQ7p6FK125voxv8ENe3io5epQMtPFzsXsfhsZHWwxFTNosqHKRzG9194tfZntj3qfgVHqkpX3H9TRh1CHnM7ujeWLxzSKO16MLrYxcnCo?purpose=inline)
+
+Black Wallet
+
+Rahul · Near MVP Colony
+
+October 30
+
+Now both reports are available.
+
+This is the moment your Member 2 functionality becomes important.
+
+# 3. How does your Member 2 feature receive Member 1's information?
+
+This is the most important concept in integration.
+
+You might be thinking:
+
+"How will my feature know that Rahul has submitted a new Found report? How will it get Ananya's old Lost report?"
+
+The answer is the shared database and the connection between your two modules.
+
+Remember, both of you are contributing to the same ReClaim application.
+
+Member 1's reporting functionality stores item information in the database.
+
+Your matching functionality is designed to access that stored information.
+
+Think of the database as a common cupboard.
+
+- Member 1 places all Lost and Found reports inside it.
+- You open that same cupboard and examine the reports.
+- You select the reports that might match.
+- You create a separate record describing the possible match.
+
+You are not copying the entire reporting functionality. You are reusing its stored information.
+
+There are two important ways to access it:
+
+First: Shared database access. Your matching functionality retrieves item records from the same MongoDB database that Member 1 uses.
+
+Second: API access. Your matching functionality can request the reports through Member 1's existing item-retrieval API.
+
+For your shared Flask and MongoDB application, the shared database is generally the simplest internal connection. You should reuse the existing database connection and respect the same authentication and authorization rules.
+
+# 4. What exactly does your matching feature do with that information?
+
+Now you have:
+
+- Ananya's Lost wallet report.
+- Rahul's Found wallet report.
+
+Your system needs to determine whether they are similar.
+
+This is not simply checking whether both reports contain the word "wallet".
+
+Your responsibility is to compare multiple characteristics.
+
+Let's understand each comparison.
+
+## A. Item name comparison
+
+Ananya reported a wallet.
+
+Rahul reported a wallet.
+
+The names match.
+
+## B. Category comparison
+
+Both selected Accessories.
+
+The categories match.
+
+## C. Colour comparison
+
+Both reported black.
+
+The colours match.
+
+## D. Description comparison
+
+Ananya described a black leather wallet with a small silver logo.
+
+Rahul described a black wallet with a silver logo.
+
+These descriptions are similar, even though the wording is not identical.
+
+## E. Location comparison
+
+Ananya lost the wallet in MVP Colony.
+
+Rahul found it near MVP Colony.
+
+The locations are close.
+
+## F. Date comparison
+
+Ananya lost it on October 30.
+
+Rahul found it on October 30.
+
+The dates match.
+
+Your system combines these comparisons to calculate a similarity score.
+
+For example, it might calculate 92%.
+
+Your matching result
+
+Ananya's Lost wallet
+
+Rahul's Found wallet
+
+# 92%
+
+Illustrative similarity score, not proof that this is the same wallet.
+
+Item name&#x20;
+
+Match
+
+
+
+Category&#x20;
+
+Match
+
+
+
+Colour&#x20;
+
+Match
+
+
+
+Description&#x20;
+
+Similar
+
+
+
+Location&#x20;
+
+Nearby
+
+
+
+Date&#x20;
+
+Same date
+
+
+
+You are responsible for deciding how much importance each characteristic receives.
+
+For example, you might give more importance to the description and location than to the date.
+
+The final scoring method and threshold are decisions you need to implement and test.
+
+# 5. What happens after your system discovers a match?
+
+Now comes another important difference between Member 1 and Member 2.
+
+Member 1 saves the original reports.
+
+You save the relationship between those reports.
+
+Think about it:
+
+The original Lost report belongs to Ananya.
+
+The original Found report belongs to Rahul.
+
+Your system should not merge them into one item report.
+
+Instead, it creates a new record saying:
+
+"Ananya's Lost report and Rahul's Found report may refer to the same physical item."
+
+This is called a match record.
+
+Your application stores the match separately so that it can:
+
+- Remember which reports matched.
+- Remember the similarity score.
+- Show the match to the appropriate users.
+- Track whether the match is still pending.
+- Avoid creating the same match repeatedly.
+
+For example, your View Matches page might display:
+
+Possible item match
+
+92% similar
+
+[Fold Wallet | Anniversary Edition – Johnny Fly](https://images.openai.com/static-rsc-4/Ky3-V7CEJMN38VEzLGF6nbO2ZUIrbJa-MDnRrPlic1T9NIAyMRL5tnxEGtNsVpZZqac5HHOhpZNA_B0Y7VokYyQ1JuguS5jD7Z46-TKc0Zz8FoRZaEYQn2dzqug_Th8nbsNxzxaW7N5Di_jxviHCRXWgSMfFMe3tMExCxGKWwtk?purpose=inline)
+
+Black wallet found
+
+Reported near MVP Colony
+
+October 30
+
+A Found report has similarities with your Lost wallet report.
+
+Awaiting verification
+
+The similarity score does not establish ownership.
+
+This is your responsibility, not Member 1's.
+
+# 6. How does Member 1 tell your feature that a new report has been submitted?
+
+This is where both of you must cooperate.
+
+Imagine Ananya submitted her Lost report yesterday.
+
+Rahul submits a Found report today.
+
+Your system should automatically check for possible matches after Rahul's report is successfully saved.
+
+Why?
+
+Because users should not have to manually tell ReClaim to compare reports.
+
+The reporting feature and matching feature need a connection.
+
+Here is the conceptual flow:
+
+## Automatic matching workflow
+
+1. Rahul submits a Found report
+
+   Member 1 receives the information.
+2. Member 1 saves the report
+
+   The report is stored in MongoDB.
+3. Member 1 triggers your matching functionality
+
+   It tells your matching module that a new report is available.
+4. Your module examines existing Lost reports
+
+   It retrieves the relevant active reports.
+5. Your algorithm compares the reports
+
+   It calculates similarity and identifies potential matches.
+6. Your module saves the match
+
+   The match is stored separately.
+7. Your module generates a notification
+
+   Ananya receives an alert about the possible match.
+
+Notice something important:
+
+Member 1 doesn't calculate the similarity.
+
+Member 1 doesn't decide which items match.
+
+Member 1 doesn't generate your match records.
+
+Member 1 only needs to make sure the newly saved report reaches your matching functionality.
+
+You own the matching process from that point onward.
+
+# 7. What if the Found report comes first?
+
+This is something you must understand very clearly.
+
+Suppose Rahul reports a Found wallet on October 29.
+
+At that moment, nobody has reported a matching Lost wallet.
+
+Your system checks existing Lost reports but finds nothing.
+
+Then Ananya reports her Lost wallet on October 30.
+
+Should the application find Rahul's old Found report?
+
+Absolutely!
+
+This is why your system must work in both directions.
+
+Case 1: Lost first, Found second
+
+1. Ananya reports LOST.
+2. Rahul reports FOUND.
+3. Your system compares new FOUND with old LOST.
+4. Possible match discovered.
+
+Case 2: Found first, Lost second
+
+1. Rahul reports FOUND.
+2. Ananya reports LOST.
+3. Your system compares new LOST with old FOUND.
+4. Possible match discovered.
+
+This is why the matching feature must be connected to Member 1's report submission process for both Lost and Found reports.
+
+# 8. What exactly do you and Member 1 need to share?
+
+Let's separate your responsibilities.
+
+| Member 1 gives you              | You give Member 1                         |
+| ------------------------------- | ----------------------------------------- |
+| Access to existing item reports | Automatic matching functionality          |
+| Item field definitions          | Matching results                          |
+| Report IDs                      | Match IDs                                 |
+| User IDs                        | Match notifications                       |
+| Report status information       | Match status information                  |
+| Existing database connection    | Matching feature integration requirements |
+
+One very important thing: both of you need to agree on what each item field means.
+
+For example, if Member 1 calls the field `color`, but you expect `itemColor`, your matching feature will not correctly read it.
+
+If Member 1 stores report types as `LOST` and `FOUND`, your matching system must use those exact values.
+
+If Member 1 uses `OPEN`, your matching logic must understand that status.
+
+This is why sharing the database structure and API details is necessary before you connect your actual work.
+
+# 9. How should you divide the work between you two?
+
+I want you to understand this because integration doesn't mean both people have to work on everything.
+
+Member 1
+
+Reporting owner
+
+1. Lost item reporting.
+2. Found item reporting.
+3. Item information and photographs.
+4. Saving reports.
+5. Retrieving reports.
+6. Editing and managing reports.
+7. Making newly saved reports available to your matching module.
+
+You – Member 2
+
+Matching owner
+
+1. Retrieve existing Lost and Found reports.
+2. Compare opposite report types.
+3. Calculate similarity scores.
+4. Rank matching results.
+5. Store match records.
+6. Prevent duplicate matches.
+7. Build View Matches.
+8. Build match-related notifications.
+9. Keep matches updated when item reports become inactive.
+
+The only important shared implementation task is connecting the report submission process to your automatic matching functionality.
+
+# 10. What should happen when an item changes?
+
+Your matching system also needs to understand that item reports can change after they are created.
+
+For example:
+
+- An item may be closed.
+- An item may be reclaimed.
+- A report may be edited.
+- A report may no longer be valid.
+
+Suppose Ananya closes her Lost report because she found her wallet herself.
+
+Should your system continue displaying Rahul's Found wallet as an active possible match for her?
+
+No.
+
+Your matching feature should respect the current status of Member 1's item records.
+
+Similarly, if an item is reclaimed, it should not continue generating new active matches.
+
+This means your matching feature is not something that runs only once and then forgets about the reports. It must work with the changing state of the shared item information.
+
+# 11. How will you know that your Member 1 and Member 2 integration is complete?
+
+Let's imagine the final demonstration.
+
+1. Ananya logs in and reports a Lost wallet.
+2. Rahul logs in and reports a Found wallet.
+3. Both reports appear in the same application's item records.
+4. Your matching feature automatically examines them.
+5. Your system identifies their similarities.
+6. A match record is created.
+7. Ananya receives a notification.
+8. Ananya opens View Matches.
+9. She sees Rahul's Found report as a possible match.
+10. The application allows the next ownership-verification step.
+
+If all of this works without someone manually copying item details or creating a match, your Member 1 and Member 2 integration is working.
+
+# 12. Finally, what should you personally do with Member 1?
+
+Don't immediately start changing the reporting files.
+
+First, sit with Member 1 and understand their completed work.
+
+You need to discuss these things:
+
+- What information does their Lost Item form collect?
+- What information does their Found Item form collect?
+- Where are those reports stored?
+- How does your application retrieve the reports?
+- How does the application identify the user who submitted each report?
+- What happens immediately after a report is submitted?
+- How will your matching feature be notified that a new report has been saved?
+
+Once you understand these, you can plan the exact connection.
+
+The central idea to remember:
+
+Member 1's feature answers: "What items have people reported?"
+
+Your feature answers: "Which of these reported Lost and Found items might belong together?"
+
+You are using Member 1's information to create a completely new capability inside the same application.
+
+That's the actual relationship between your two modules, bro. ❤️ Bro, now I'll explain how you personally perform the integration, from the moment you receive Member 1's work until your Member 2 feature actually works with it.
+
+Think of this as a practical integration procedure. Imagine Member 1 has completed the reporting module and you have completed your matching module. Now you need to bring them together.
+
+There are 7 main steps.
+
+# Step 1: Get Member 1's completed work
+
+First, you need access to Member 1's latest code.
+
+Since you are working on the same GitHub repository, Member 1 should push their completed work to their own branch and share it with you.
+
+You need to obtain:
+
+- Their reporting frontend.
+- Their reporting backend.
+- Their database connection details and item structure.
+- Their existing API functionality.
+
+Why?
+
+Because your matching feature must use the actual item information that their reporting feature saves.
+
+For example, Member 1 might have created a Lost Item form containing:
+
+| Field       | Example              |
+| ----------- | -------------------- |
+| Item name   | Wallet               |
+| Category    | Accessories          |
+| Colour      | Black                |
+| Description | Black leather wallet |
+| Location    | MVP Colony           |
+| Date        | 30 October           |
+| Report type | LOST                 |
+| User ID     | User 101             |
+
+You need to know exactly how these fields are named and stored.
+
+Your first task is to understand their existing implementation, not change it.
+
+# Step 2: Bring Member 1's work into your local project
+
+You need both modules available in the same project so you can work on the integration.
+
+For example, your team might have:
+
+- `main` – shared project.
+- `member1-reporting` – Member 1's work.
+- `member2-matching` – your work.
+
+There are two ways to proceed:
+
+Option A – Member 1 merges their completed reporting module into main.
+
+You update your local project with the latest `main` branch. This is the easiest approach when their work is ready and reviewed.
+
+Option B – Member 1's work is still on their branch.
+
+You can obtain their branch and test your work against it before merging. You should coordinate this with Member 1 so you don't accidentally overwrite or merge incomplete changes.
+
+The goal is to have both features available in one working project.
+
+# Step 3: Connect your matching feature to Member 1's database
+
+This is the actual beginning of technical integration.
+
+Imagine Member 1 has created a database collection called `items`.
+
+It contains all the Lost and Found reports.
+
+You should not create another `items` collection just for yourself.
+
+Instead, you reuse the same collection.
+
+## How your shared database works
+
+Member 1
+
+Saves Lost and Found reports.
+
+Creates and manages item records.
+
+One shared MongoDB database
+
+`items` collection
+
+Contains the original item reports.
+
+You – Member 2
+
+Read reports and compare them.
+
+Create your own `matches` and `notifications` collections.
+
+In practical terms, you need to:
+
+1. Find out which MongoDB database Member 1 uses.
+2. Find out which file manages the database connection.
+3. Reuse that same connection in your matching module.
+4. Retrieve item records from the existing `items` collection.
+5. Use those records as input to your matching system.
+
+You should coordinate access to the database configuration rather than create a second connection with different settings.
+
+# Step 4: Connect your matching feature to the report submission process
+
+This is the most important integration step.
+
+Your matching algorithm might already work when you give it two sample items.
+
+But how will it know when a real user submits a new report?
+
+You need Member 1's reporting functionality to trigger your matching functionality after a successful submission.
+
+Let's take the example:
+
+Ananya reports a Lost wallet.
+
+1. Member 1's reporting feature receives her form.
+2. The report is saved in MongoDB.
+3. The saved report becomes available to your matching module.
+4. Your matching module checks existing Found reports.
+5. It calculates similarity scores.
+6. If it finds a qualifying match, it creates a match record.
+
+Now imagine Rahul submits a Found wallet.
+
+The same process happens, but your matching module checks existing Lost reports.
+
+This means you and Member 1 must make one specific connection:
+
+Member 1's report-submission process must invoke your matching functionality after the item is successfully saved.
+
+You are responsible for providing the matching functionality. Member 1 must coordinate the point at which it is triggered.
+
+Do not run matching before the report is saved, because your algorithm needs the actual saved item and its unique ID.
+
+# Step 5: Connect your matching results to the frontend
+
+Now your matching algorithm can discover possible matches.
+
+But users need to see those results.
+
+This is where your View Matches page comes in.
+
+Imagine Ananya logs into ReClaim.
+
+She opens the View Matches section.
+
+Your frontend requests the matches associated with her account. Your backend retrieves them from your `matches` collection.
+
+She sees:
+
+Possible match found
+
+92% similar
+
+[Heritage Black Leather Wallet | Timepieces International](https://images.openai.com/static-rsc-4/2NkFgjUrw8b-fA3xjWrLa2IM7ZlDMANwZUPfWxJBBeL7u4dPoxUfQTr0XkP-ISZJtjGsr7kjtIP8Y8ek66hoT2dV_cPaqNGZeIOu8NeJx4_3l2ht2bO7QYTWzA3-xica1UJu6X6gbINa7G4Nf4TgH8LSr4Lc3_yFXythV7fw840?purpose=inline)
+
+Black leather wallet
+
+Found near MVP Colony
+
+Reported on October 30
+
+This item has similar characteristics to your Lost wallet report.
+
+Illustrative example, not an actual ReClaim match.
+
+This page is your responsibility.
+
+Member 1 does not need to build this page for you.
+
+However, your page should reuse the same application's login, navigation, design and authentication system.
+
+# Step 6: Connect notifications
+
+After creating a match, your matching module must notify the correct user.
+
+For example:
+
+Ananya should receive:
+
+> A possible match for your lost wallet has been found! Check your View Matches section.
+
+Your notification feature retrieves the notification associated with Ananya's logged-in account.
+
+She clicks it and is taken to the relevant match.
+
+You are responsible for:
+
+- Creating the notification.
+- Saving it.
+- Displaying it.
+- Showing unread notifications.
+- Marking notifications as read.
+- Ensuring that only the intended user can access them.
+
+Again, you are reusing Member 1's authentication system. You are not creating another login system.
+
+# Step 7: Test both modules together
+
+Now you and Member 1 should sit together and test the complete workflow.
+
+## Your integration test
+
+1. Member 1: Create a Lost report
+
+   User A reports a black wallet.
+2. Member 1: Create a Found report
+
+   User B reports a similar black wallet.
+3. You: Check automatic matching
+
+   Your system compares both reports.
+4. You: Check the match record
+
+   Verify that the match and similarity score are saved.
+5. You: Check the notification
+
+   User A receives the correct notification.
+6. You: Check View Matches
+
+   User A can see the possible match.
+
+Also repeat the test with Found first and Lost second.
+
+Test different items too. A black wallet should not automatically match a completely unrelated item just because its location is similar.
+
+# 8. Which files do you actually need to integrate?
+
+Based on the earlier inspection of your project, the reporting functionality was in the existing Flask backend and MongoDB setup.
+
+Your proposed additions could look like this:
+
+| Existing Member 1 files          | Your Member 2 files      |
+| -------------------------------- | ------------------------ |
+| `app.py`                         | `matching.py`            |
+| `database.py`                    | `matching_routes.py`     |
+| Existing item-reporting routes   | `notification_routes.py` |
+| Existing item-reporting frontend | `view-matches.html`      |
+| Existing authentication          | `matches.js`             |
+| Existing item collection         | `notifications.js`       |
+
+These are suggested names. You should adapt them to your actual repository.
+
+One important shared file is the main Flask application. It needs to register your matching and notification routes along with Member 1's existing routes.
+
+Coordinate this change instead of independently replacing the main application file.
+
+# 9. Who does what during integration?
+
+| Task                                     | Member 1    | You                       |
+| ---------------------------------------- | ----------- | ------------------------- |
+| Create Lost/Found forms                  | Responsible | —                         |
+| Save item reports                        | Responsible | —                         |
+| Maintain item records                    | Responsible | Coordinate                |
+| Share item data                          | Responsible | Receive and use           |
+| Matching algorithm                       | —           | Responsible               |
+| Similarity score                         | —           | Responsible               |
+| Match records                            | —           | Responsible               |
+| View Matches                             | —           | Responsible               |
+| Notifications                            | —           | Responsible               |
+| Trigger matching after report submission | Coordinate  | Provide matching function |
+| Test the complete workflow               | Together    | Together                  |
+
+# 10. What I want you to do first
+
+Don't start merging random files or changing Member 1's backend yet.
+
+I want to establish exactly how your current repository is organized.
+
+One question: Has Member 1 already completed and pushed their reporting module to your shared GitHub repository, or are they still developing it?
+
+That determines whether your next integration step is bringing their work into your branch or connecting your matching module directly to their existing implementation. 

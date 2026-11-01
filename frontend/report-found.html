@@ -6,6 +6,7 @@
     <title>Report found item | ReClaim</title>
     <link rel="stylesheet" href="/css/style.css">
     <script defer src="/js/api.js"></script>
+    <script defer src="/js/notifications.js"></script>
     <script defer src="/js/report.js"></script>
 </head>
 <body>
@@ -14,15 +15,17 @@
         <nav>
             <a href="/dashboard.html">Dashboard</a>
             <a href="/find-items.html">Find items</a>
+            <a href="/view-matches.html">View matches</a>
             <a href="/my-reports.html">My reports</a>
+            <button class="link-button" id="logoutButton">Logout</button>
         </nav>
     </header>
 
     <main class="wrap page narrow fade-in">
         <a class="back-link" href="/dashboard.html">← Dashboard</a>
-        <span class="eyebrow">FOUND ITEM REPORT</span>
+        <span class="eyebrow">FOUND ITEM REPORT · MODULE 1</span>
         <h1>Help an item find its owner</h1>
-        <p class="muted">Share the details of the item you found.</p>
+        <p class="muted">Share the details of the item you found. The smart matching engine will immediately scan for matching lost reports and notify the owner.</p>
         
         <form id="itemForm" class="panel form-grid" enctype="multipart/form-data">
             <input type="hidden" name="reportType" value="FOUND">

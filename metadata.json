@@ -1,0 +1,6 @@
+{
+  "name": "ReClaim – Find Your Belongings",
+  "description": "Smart lost and found management platform with automated item matching, ownership verification, and secure recovery workflows.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

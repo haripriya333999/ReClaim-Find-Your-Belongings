@@ -6,14 +6,16 @@
     <title>Dashboard | ReClaim</title>
     <link rel="stylesheet" href="/css/style.css">
     <script defer src="/js/api.js"></script>
+    <script defer src="/js/notifications.js"></script>
     <script defer src="/js/dashboard.js"></script>
 </head>
 <body>
     <header class="topbar">
         <a class="brand" href="/">Re<span>Claim</span></a>
         <nav>
-            <a href="/dashboard.html">Dashboard</a>
+            <a href="/dashboard.html" class="active" style="color:var(--green-dark);font-weight:700">Dashboard</a>
             <a href="/find-items.html">Find items</a>
+            <a href="/view-matches.html">View matches</a>
             <a href="/my-reports.html">My reports</a>
             <button class="link-button" id="logoutButton">Logout</button>
         </nav>
@@ -24,11 +26,20 @@
             <div>
                 <span class="eyebrow">YOUR SPACE</span>
                 <h1 id="welcomeTitle">Dashboard</h1>
-                <p class="muted">Report an item or browse reports shared by the community.</p>
+                <p class="muted">Report an item, browse reports, or view auto-detected matches.</p>
             </div>
         </div>
 
-        <section class="quick-grid">
+        <!-- Live Database Connectivity Status Banner -->
+        <div id="dbStatusBar" style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-radius:12px;margin-bottom:24px;font-size:0.85rem;background:#f8fafc;border:1px solid #e2e8f0;flex-wrap:wrap;gap:8px;">
+            <div id="dbStatusText" style="display:flex;align-items:center;gap:8px;">
+                <span id="dbStatusDot" style="width:10px;height:10px;border-radius:50%;background:#94a3b8;display:inline-block"></span>
+                <span id="dbStatusLabel">Checking MongoDB Atlas connection…</span>
+            </div>
+            <div id="dbStatusDetail" style="font-size:0.8rem;color:var(--muted)">Cluster: reclaim-cluster.3bnnmc9.mongodb.net</div>
+        </div>
+
+        <section class="quick-grid" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));">
             <a class="quick-card lost stagger-1" href="/report-lost.html">
                 <span class="quick-icon">⌕</span>
                 <h2>Report a lost item</h2>
@@ -41,15 +52,36 @@
                 <p>Help someone get their belongings back.</p>
                 <span class="card-link">Create found report →</span>
             </a>
-            <a class="quick-card browse stagger-3" href="/find-items.html">
-                <span class="quick-icon">⌕</span>
+            <a class="quick-card browse stagger-3" href="/view-matches.html" style="background:#f0faf5;border-color:#bbf7d0;">
+                <span class="quick-icon" style="color:var(--green)">⚡</span>
+                <h2>View matches</h2>
+                <p>Auto-identified potential matches & scores.</p>
+                <span class="card-link" style="color:var(--green-dark)">Explore matches →</span>
+            </a>
+            <a class="quick-card browse stagger-4" href="/find-items.html">
+                <span class="quick-icon">🔎</span>
                 <h2>Find items</h2>
-                <p>Browse lost and found reports.</p>
+                <p>Browse all active community reports.</p>
                 <span class="card-link">Browse reports →</span>
             </a>
         </section>
 
-        <section class="panel stagger-4">
+        <!-- Member 2: Recent Potential Matches Section -->
+        <section class="panel stagger-3" style="margin-top:28px;">
+            <div class="section-head">
+                <div>
+                    <h2>⚡ Discovered Matches for You</h2>
+                    <p class="muted">Potential matches identified by smart matching engine.</p>
+                </div>
+                <a href="/view-matches.html">View all matches →</a>
+            </div>
+            <div id="dashboardMatches" class="matches-grid" style="margin-top:16px;">
+                <p class="muted">Scanning for matching belongings…</p>
+            </div>
+        </section>
+
+        <!-- Member 1: Recent Reports Section -->
+        <section class="panel stagger-4" style="margin-top:28px;">
             <div class="section-head">
                 <div>
                     <h2>Your recent reports</h2>

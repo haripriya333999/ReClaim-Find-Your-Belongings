@@ -1,0 +1,898 @@
+Bro, let's break this down properly. I want you to understand exactly what is already done, what is incomplete, why it is incomplete, and what you personally need to do as Member 2 — not just receive a list of files to edit.
+
+I reviewed the latest ZIP you uploaded. One important clarification: this latest version is a TypeScript + Express + HTML/CSS/JavaScript project, whereas the earlier ZIP you shared contained a Python Flask backend. We must work from the latest version and avoid mixing the two architectures.
+
+Your responsibility is not to build another ReClaim application. Your responsibility is to make the Smart Matching & Item Discovery module work reliably with the actual reports, users and database shared by the other two members.
+
+# Part 1 – Understand your responsibility as Member 2
+
+Your entire role can be understood through this example.
+
+Imagine two people use ReClaim:
+
+- Person A loses a black wallet and submits a LOST report.
+- Person B finds a black wallet and submits a FOUND report.
+
+Your module must automatically recognise that these two reports might describe the same belonging.
+
+## How your module should work
+
+Person A – Owner
+
+Reports: LOST – Black wallet
+
+Member 1 saves the report
+
+Person B – Finder
+
+Reports: FOUND – Black wallet
+
+Your Member 2 matching engine
+
+Compare both reports
+
+- Item name
+- Category
+- Colour
+- Description
+- Location
+- Date
+
+Possible match discovered
+
+Example: 92%
+
+The match is saved and both relevant users receive notifications.
+
+Member 3 – Ownership Verification & Recovery
+
+The owner can proceed with verification. A similarity score alone must never prove ownership.
+
+Your work is the middle of this process: retrieving reports, comparing them, creating match records, displaying potential matches and notifying the correct people.
+
+# Part 2 – What you have already implemented
+
+These are features I found in your latest ZIP. They are present in the code, but some still need real database integration and testing.
+
+## 1. Smart matching algorithm
+
+Implemented in code
+
+Your `server.ts` contains a function called:
+
+```
+calculateMatchScore(lost, found)
+```
+
+This function compares a Lost report with a Found report and calculates a score out of 100.
+
+Your current scoring weights are:
+
+| Matching criterion | Maximum score |
+| ------------------ | ------------- |
+| Item name          | 20            |
+| Category           | 15            |
+| Colour             | 15            |
+| Description        | 20            |
+| Location           | 20            |
+| Date               | 10            |
+| Total              | 100           |
+
+For example:
+
+A user reports:
+
+- Item: Black wallet
+- Category: Accessories
+- Colour: Black
+- Description: Leather wallet with a college ID
+- Location: Library
+- Date: 28 October
+
+Another user reports:
+
+- Item: Wallet
+- Category: Accessories
+- Colour: Black
+- Description: Leather wallet found with an ID card
+- Location: Near library
+- Date: 28 October
+
+Your algorithm compares these details and calculates a similarity score.
+
+What remains: You need to test the scoring with realistic reports, including spelling differences, incomplete descriptions, different location descriptions and dates far apart.
+
+Also, make sure users understand that a 90% score means a strong potential match, not 90% certainty that it is the same physical item.
+
+## 2. Automatic matching in both directions
+
+Implemented in code
+
+This is one of the most important requirements of your role.
+
+Your code already handles two scenarios.
+
+Scenario A – Someone finds an item first
+
+1. Person B submits a FOUND report.
+2. Your engine retrieves existing active LOST reports.
+3. It compares the new FOUND report against those LOST reports.
+4. It creates qualifying matches.
+
+Scenario B – Someone loses an item first
+
+1. Person A submits a LOST report.
+2. Your engine retrieves existing active FOUND reports.
+3. It compares the new LOST report against those FOUND reports.
+4. It creates qualifying matches.
+
+Your code also contains checks to avoid matching reports from the same user and to ignore non-open reports.
+
+What remains: We must verify that this automatic matching works with actual reports saved by Member 1, not just the sample reports in your current server.
+
+## 3. Match records
+
+Implemented in code
+
+Your code has a `MatchRecord` structure with fields such as:
+
+- Match ID
+- Lost item ID
+- Found item ID
+- Owner ID
+- Finder ID
+- Similarity score
+- Scoring breakdown
+- Match status
+- Creation and update dates
+
+This is exactly the kind of information your matching module needs to preserve.
+
+What remains: Currently, these records are stored in an in-memory JavaScript `Map`. They need to be stored permanently in MongoDB.
+
+## 4. View Matches page
+
+Frontend implemented
+
+Your ZIP includes:
+
+- `frontend/view-matches.html`
+- `frontend/js/matches.js`
+
+The page already supports:
+
+- Viewing potential matches
+- Displaying Lost and Found reports side by side
+- Showing similarity percentages
+- Showing the scoring breakdown
+- Searching matches
+- Filtering by category
+- Filtering by minimum score
+- Filtering by match status
+- Opening a match detail view
+- Starting the Member 3 verification workflow
+
+What remains: Verify that this page displays matches retrieved from the shared database, rather than only matches generated inside the current server's memory.
+
+## 5. Notifications
+
+Frontend and API code present
+
+Your ZIP includes:
+
+- `frontend/js/notifications.js`
+- Notification API routes in `server.ts`
+
+The code includes:
+
+- Notification listing
+- Unread notification count
+- Marking a notification as read
+- Marking all notifications as read
+
+What remains: Persist the notifications in MongoDB, confirm that they are sent to the correct users, and test that the unread count updates properly.
+
+# Part 3 – What is actually incomplete, and why?
+
+This is the most important section. There is a difference between having a feature in your code and having a feature connected to the real application.
+
+## 6. Connect your backend to MongoDB Atlas
+
+Not implemented in the latest ZIP
+
+You and Member 1 have already arranged the Atlas cluster and shared the connection details. But the latest uploaded project does not actually connect to MongoDB.
+
+I checked three things:
+
+A. Your `package.json`
+
+It includes Express, JWT, bcrypt, React and other dependencies, but it does not include the MongoDB driver or Mongoose.
+
+B. Your `server.ts`
+
+It contains:
+
+```
+const users = new Map<string, User>();
+const items = new Map<string, Item>();
+const images = new Map<string, StoredImage>();
+const matches = new Map<string, MatchRecord>();
+const notifications = new Map<string, NotificationRecord>();
+```
+
+These are temporary in-memory data structures.
+
+C. Your `.env.example`
+
+It has `JWT_SECRET` and `DB_NAME`, but it does not have `MONGO_URI`.
+
+Your server also reads the database name, but that alone does not establish a MongoDB connection.
+
+### What does this mean?
+
+Imagine you submit a Lost report.
+
+The current backend can store it in its `items` Map. You can then generate a match from that report.
+
+But if you stop and restart the server, the Map is recreated. The report and generated match are lost.
+
+MongoDB solves this problem by permanently storing your data.
+
+### What you need to implement
+
+First, install a MongoDB driver. I recommend using the official MongoDB Node.js driver because your current backend is already TypeScript and Express.
+
+You will need to:
+
+1. Install the MongoDB dependency.
+2. Create a MongoDB connection module.
+3. Read the connection string from `.env`.
+4. Connect to the existing Atlas cluster.
+5. Select the agreed database name.
+6. Create or access the required collections.
+7. Replace the in-memory data storage with database operations.
+
+Your intended database structure should look like this:
+
+reclaim-cluster
+
+reclaim_db&#x20;
+
+Confirm with Member 1
+
+
+
+users
+
+Member accounts
+
+items
+
+Lost and Found reports
+
+matches
+
+Your potential match records
+
+notifications
+
+Your user notifications
+
+The important point is that `users` and `items` must be shared with Member 1, not recreated independently by you.
+
+You will own the matching and notification functionality, but the team owns the shared database architecture.
+
+## 7. Integrate with Member 1's actual report collection
+
+Not yet verified
+
+Your matching algorithm needs reports from the actual application.
+
+Member 1 is responsible for the reporting module. Their job is to save reports in the shared `items` collection.
+
+Your job is to retrieve those reports.
+
+For example, the database may contain:
+
+```
+items
+  ├── Report 1: LOST - Black Wallet
+  ├── Report 2: FOUND - Black Wallet
+  ├── Report 3: LOST - Blue Backpack
+  └── Report 4: FOUND - Silver Keys
+```
+
+Your matching engine should read these records and compare only suitable LOST and FOUND pairs.
+
+### What you must coordinate with Member 1
+
+Confirm these fields are consistent between their reporting module and your matching module:
+
+| Field         | Why you need it                         |
+| ------------- | --------------------------------------- |
+| `_id`         | Identify each report                    |
+| `userId`      | Identify the report owner               |
+| `reportType`  | Distinguish LOST and FOUND              |
+| `itemName`    | Compare item names                      |
+| `category`    | Compare categories                      |
+| `description` | Compare item details                    |
+| `color`       | Compare colours                         |
+| `location`    | Compare reported locations              |
+| `date`        | Compare when the item was lost or found |
+| `status`      | Ignore inactive reports                 |
+| `imageId`     | Retrieve associated images if needed    |
+
+The exact field names and formats must match the actual Member 1 database schema.
+
+Do not assume that the schema from the older Python ZIP and the latest TypeScript ZIP are automatically compatible. We need Member 1 to confirm which version is the team's current shared backend.
+
+## 8. Connect automatic matching to Member 1's report submission
+
+Trigger exists in current code; shared integration unverified
+
+Your current `server.ts` already contains a matching trigger after a new report is saved.
+
+Conceptually, the correct workflow is:
+
+```
+User submits a report
+        |
+        v
+Member 1 validates report
+        |
+        v
+Report is saved in MongoDB
+        |
+        v
+Member 2 matching engine is triggered
+        |
+        v
+Retrieve opposite report type
+        |
+        v
+Calculate similarity
+        |
+        v
+Create qualifying match records
+        |
+        v
+Create notifications
+```
+
+### Your responsibility
+
+You need to make sure the trigger is connected to the actual report submission process.
+
+There are two ways your team can coordinate this:
+
+- Shared backend: Member 1 calls your matching service after successfully inserting a report.
+- Separate backend services: Member 1 calls a protected matching API after saving a report.
+
+The first is generally simpler if the team uses one shared Express backend.
+
+### Test both situations
+
+Test 1:
+
+- Create a LOST report.
+- Create a corresponding FOUND report.
+- Confirm that a match is generated.
+
+Test 2:
+
+- Create a FOUND report.
+- Create a corresponding LOST report.
+- Confirm that a match is generated.
+
+Both must work without manually clicking a matching button.
+
+## 9. Store match records permanently
+
+Needs MongoDB integration
+
+Your current code already creates match records.
+
+However, it uses:
+
+```
+matches.set(matchId, matchDoc);
+```
+
+That stores the record in memory.
+
+You need to replace this with a database insert or equivalent persistent operation.
+
+For each qualifying match, save:
+
+| Field         | Example                |
+| ------------- | ---------------------- |
+| `_id`         | Unique match ID        |
+| `lostItemId`  | ID of the LOST report  |
+| `foundItemId` | ID of the FOUND report |
+| `ownerId`     | User who lost the item |
+| `finderId`    | User who found it      |
+| `score`       | Similarity percentage  |
+| `breakdown`   | Six comparison scores  |
+| `status`      | PENDING                |
+| `createdAt`   | Creation date          |
+| `updatedAt`   | Last update            |
+
+### Duplicate prevention
+
+Imagine the same two reports are compared again.
+
+You must not create another match record for the same pair.
+
+For example:
+
+```
+LOST-101 + FOUND-205 = MATCH-1
+```
+
+If the engine runs again:
+
+```
+LOST-101 + FOUND-205 = MATCH-1
+```
+
+It should reuse the existing match rather than create `MATCH-2`.
+
+You should enforce this in application logic and ideally add a unique database index for the pair of report IDs.
+
+Also consider what should happen if a report is edited, closed or reclaimed. Its associated match records must not continue appearing as active potential matches.
+
+## 10. Store notifications permanently
+
+Needs MongoDB integration
+
+Your current notification logic is present, but notifications are also stored in an in-memory Map.
+
+You need to save them in MongoDB.
+
+For every new match, your system should notify both relevant users:
+
+- The owner who reported the lost item.
+- The finder who reported the found item.
+
+For example:
+
+Possible match found!
+
+New
+
+A found black wallet may match your lost wallet.
+
+Example notification for the owner
+
+Possible match found!
+
+Your found item may match someone's lost report.
+
+Example notification for the finder
+
+Your notification record should contain:
+
+- Notification ID
+- Recipient user ID
+- Match ID
+- Title
+- Message
+- Read/unread status
+- Creation timestamp
+
+### Important things to test
+
+1. The owner receives the notification.
+2. The finder receives the notification.
+3. An unrelated user cannot see either notification.
+4. Clicking a notification opens the corresponding match.
+5. Marking one notification as read changes its status.
+6. Marking all as read updates the unread count.
+7. Restarting the server does not erase notifications.
+
+Also make sure the same match does not create duplicate notifications every time the matching engine recalculates.
+
+# Part 4 – Complete and test your frontend
+
+## 11. Finish View Matches
+
+Page already present
+
+You do not need to redesign the entire page from scratch.
+
+You already have `view-matches.html` and `matches.js`.
+
+Your remaining work is to ensure they use actual MongoDB-backed API responses.
+
+Check the following:
+
+| Feature             | Expected behaviour                   |
+| ------------------- | ------------------------------------ |
+| Match listing       | Shows the logged-in user's matches   |
+| Match score         | Shows a score from 0–100             |
+| Lost report         | Shows the corresponding lost item    |
+| Found report        | Shows the corresponding found item   |
+| Score breakdown     | Displays all six comparison criteria |
+| Search              | Finds matches using item details     |
+| Category filter     | Filters by item category             |
+| Score filter        | Filters by minimum score             |
+| Status filter       | Filters by match status              |
+| Match details       | Opens the selected match             |
+| Verification button | Connects to Member 3's workflow      |
+
+### Privacy requirement
+
+A user must only see matches involving their own reports.
+
+For example:
+
+- Person A should see matches involving Person A's lost or found reports.
+- Person B should see matches involving Person B's reports.
+- Person C should not be able to access either person's private match records unless they are involved in that match.
+
+Your current code contains ownership checks. Preserve those checks when migrating to MongoDB.
+
+## 12. Finish Notifications
+
+Page/controller code already present
+
+Your `notifications.js` already implements the notification dropdown and unread counter.
+
+Check:
+
+- Notification bell appears for logged-in users.
+- Unread count is accurate.
+- Notifications load from the backend.
+- New notifications appear for the correct recipient.
+- Clicking a notification opens the right match.
+- Mark all as read works.
+- The count updates after reading notifications.
+
+Your current frontend refreshes the unread count periodically. That can be acceptable for a student project, but the backend must return accurate persistent data.
+
+# Part 5 – Connect your work to Member 3
+
+## 13. Coordinate the verification and recovery workflow
+
+Integration testing required
+
+Your current code already has a verification button that acts as a bridge to Member 3.
+
+But you must agree on how the modules communicate.
+
+Your role ends at identifying a possible match and making the match available to the recovery workflow.
+
+Member 3's responsibility begins with verifying whether the found item actually belongs to the claimant.
+
+The expected flow:
+
+1. Your engine identifies a possible match.
+2. Your match record is created with `PENDING` status.
+3. Both users are notified.
+4. The owner proceeds to the verification process.
+5. Member 3 handles verification questions and evidence.
+6. The finder and owner proceed through the agreed recovery process.
+7. Member 3 updates the recovery status.
+8. Your View Matches page reflects the updated status.
+
+### Agree on these statuses
+
+Your code already defines:
+
+- `PENDING`
+- `CLAIM_IN_PROGRESS`
+- `VERIFIED`
+- `REJECTED`
+- `CLOSED`
+- `RECLAIMED`
+
+Discuss with Member 3 what each status means and who is allowed to change it.
+
+For example:
+
+| Status            | Meaning                          |
+| ----------------- | -------------------------------- |
+| PENDING           | Possible match detected          |
+| CLAIM_IN_PROGRESS | Ownership verification started   |
+| VERIFIED          | Ownership verification succeeded |
+| REJECTED          | Claim rejected                   |
+| CLOSED            | Match is no longer active        |
+| RECLAIMED         | Item successfully returned       |
+
+Do not allow the similarity engine to mark a match as VERIFIED. That must be controlled by the ownership verification process.
+
+# Part 6 – Important security and reliability work
+
+These are not optional details. They matter because your application handles personal reports and user accounts.
+
+## 14. Fix JWT configuration
+
+Security change required
+
+Your current `server.ts` contains a fallback JWT secret:
+
+```
+const JWT_SECRET = process.env.JWT_SECRET && process.env.JWT_SECRET.length >= 32
+  ? process.env.JWT_SECRET
+  : 'reclaim_super_secure_jwt_secret_key_minimum_32_characters_long_2026';
+```
+
+This is not safe for the final shared application.
+
+If the environment variable is missing, your backend silently uses a publicly visible fallback.
+
+Change the design so that the application refuses to start if the shared secret is missing or too short.
+
+Also:
+
+- Use the replacement secret coordinated by Member 1.
+- Use the same secret across all services that verify the same tokens.
+- Never expose the secret in frontend JavaScript.
+- Never push `.env` to GitHub.
+
+And remember: the JWT secret and MongoDB password you shared earlier should be rotated before deployment.
+
+## 15. Remove demo data from production
+
+Important cleanup required
+
+Your current server runs:
+
+```
+seedDemoData();
+```
+
+This inserts example users, reports, images and sample matches into memory whenever the server starts.
+
+That is useful while developing and demonstrating your UI.
+
+But it should not be part of the final real-user application.
+
+You need to:
+
+1. Separate demo data from real application data.
+2. Keep sample data in a controlled development-only seed script.
+3. Prevent demo accounts and reports from being inserted into production.
+4. Test with real registrations and reports.
+
+Otherwise, your application may display fake users and fake reports alongside actual user submissions.
+
+## 16. Test authentication and authorization
+
+Your matching module depends on login authentication.
+
+Test the following:
+
+- Logged-out users cannot access private match endpoints.
+- Logged-in users can see their own matches.
+- Users cannot read another person's notifications.
+- Users cannot change another person's match status.
+- Invalid or expired JWT tokens are rejected.
+- Passwords are stored as hashes, not plain text.
+
+Your existing code includes some authorization checks. You need to preserve and test them after changing the storage system.
+
+# Part 7 – The exact testing you must perform
+
+This is how you prove that your work is genuinely complete.
+
+I recommend the following tests in order.
+
+## Test 1: Basic match creation
+
+| User   | Action                       |
+| ------ | ---------------------------- |
+| User A | Reports LOST – Black Wallet  |
+| User B | Reports FOUND – Black Wallet |
+
+Expected result:
+
+- A potential match is generated.
+- A match record is stored in MongoDB.
+- Both users receive notifications.
+- Both users can see the relevant match.
+
+## Test 2: Reverse matching
+
+| User   | Action                        |
+| ------ | ----------------------------- |
+| User A | Reports FOUND – Blue Backpack |
+| User B | Reports LOST – Blue Backpack  |
+
+Expected result: The same matching process works in reverse.
+
+## Test 3: No false self-matching
+
+One user submits both a LOST and a FOUND report for the same item.
+
+Expected result: The reports should not be matched to each other.
+
+## Test 4: Unrelated reports
+
+User A loses a black wallet. User B finds a set of silver keys.
+
+Expected result: The engine should not create an obviously irrelevant match.
+
+## Test 5: Duplicate prevention
+
+Run matching multiple times for the same two reports.
+
+Expected result: Only one match record and one set of notifications should exist for that pair.
+
+## Test 6: Closed reports
+
+A report is marked CLOSED or RECLAIMED.
+
+Expected result: It should no longer generate new active matches. Existing associated matches should be updated consistently.
+
+## Test 7: Persistence
+
+1. Create a Lost report.
+2. Create a Found report.
+3. Generate the match.
+4. Create notifications.
+5. Stop the backend.
+6. Restart the backend.
+7. Log in again.
+
+Expected result: The reports, matches and notifications should still exist.
+
+This is one of the most important tests because it proves that you are using MongoDB rather than temporary memory.
+
+## Test 8: Three-member integration
+
+Test the complete workflow:
+
+```
+Member 1: Report submission
+          |
+          v
+Member 2: Automatic matching
+          |
+          v
+Member 2: Match record + notifications
+          |
+          v
+Member 3: Ownership verification
+          |
+          v
+Member 3: Recovery and return confirmation
+          |
+          v
+Member 2: Updated match status
+          |
+          v
+Member 1: Updated report status
+```
+
+Expected result: All three modules work together without creating duplicate records or inconsistent statuses.
+
+# Part 8 – The order in which you should complete everything
+
+Bro, don't try to implement all these things simultaneously. Follow this sequence.
+
+## Your Member 2 implementation roadmap
+
+1. Phase 1 – Confirm the shared architecture
+   - Confirm which ZIP/repository is the team's latest version.
+   - Confirm whether the team is using the Express backend or the older Flask backend.
+   - Confirm Member 1's MongoDB database name and collection schema.
+   - Coordinate replacement credentials.
+   - Confirm the shared JWT configuration.
+2. Phase 2 – MongoDB integration
+   - Install the MongoDB driver.
+   - Create the database connection.
+   - Connect to the existing Atlas cluster.
+   - Access the shared `users` and `items` collections.
+   - Create or access `matches` and `notifications`.
+   - Remove in-memory storage from the real application workflow.
+3. Phase 3 – Matching engine integration
+   - Retain and improve your existing scoring algorithm.
+   - Retrieve real active reports.
+   - Implement both matching directions.
+   - Prevent duplicate matches.
+   - Handle report status changes.
+   - Save match records permanently.
+4. Phase 4 – Notification integration
+   - Generate notifications for both users.
+   - Save notifications in MongoDB.
+   - Implement read/unread operations.
+   - Enforce notification ownership.
+   - Test notification links and unread counts.
+5. Phase 5 – Frontend integration
+   - Connect View Matches to the persistent API.
+   - Connect notifications to the persistent API.
+   - Verify filters, search and detail views.
+   - Verify the Member 3 verification button.
+   - Test logged-in and logged-out behaviour.
+6. Phase 6 – Team integration and final testing
+   - Coordinate with Member 1's report creation.
+   - Coordinate with Member 3's verification and recovery.
+   - Run all eight test scenarios.
+   - Remove demo data from production.
+   - Fix errors and verify data persistence.
+
+# Part 9 – Which files will you probably work on?
+
+Based on the latest ZIP, these are the files relevant to your work.
+
+| File                           | What you need to do                                                              |
+| ------------------------------ | -------------------------------------------------------------------------------- |
+| `server.ts`                    | Integrate MongoDB, persistent reports, matching, match records and notifications |
+| `package.json`                 | Add MongoDB dependency                                                           |
+| `.env.example`                 | Document required environment variable names without real credentials            |
+| `.gitignore`                   | Keep `.env` excluded                                                             |
+| `frontend/view-matches.html`   | Check the matches page                                                           |
+| `frontend/js/matches.js`       | Connect and test the matching interface                                          |
+| `frontend/js/notifications.js` | Connect and test notifications                                                   |
+| `frontend/js/api.js`           | Reuse the existing API and JWT request handling                                  |
+| New database module            | Create and manage the shared MongoDB connection                                  |
+| Optional matching module       | Separate matching logic from the main server when the team is ready              |
+
+You don't have to rewrite everything. Your existing matching engine and frontend are valuable starting points.
+
+# Part 10 – What you should ask your teammates
+
+Before modifying shared files, coordinate these points.
+
+Hey, I reviewed the current ReClaim project and my Member 2 Smart Matching module is already implemented at the logic and frontend level.
+
+I now need to complete the real database integration and test the entire workflow.
+
+Can we confirm a few things?
+
+1. Which backend version are we using as our final shared project — the TypeScript/Express version or the earlier Python/Flask version?
+2. Is the MongoDB Atlas database name confirmed as reclaim_db?
+3. Are the users and items collections already connected to Atlas?
+4. What exact item field names and status values should my matching module use?
+5. Can Member 1 trigger my matching function immediately after a report is successfully saved?
+6. Can Member 3 confirm the match statuses and recovery integration we will share?
+
+I want to make sure my module uses the same database, authentication and report structure as the other two modules rather than creating separate systems.
+
+# My final assessment
+
+Your Member 2 work is not starting from zero. You have already built much of the actual matching functionality.
+
+But I would separate your progress into three categories:
+
+| Area                            | Assessment                                |
+| ------------------------------- | ----------------------------------------- |
+| Matching algorithm              | Implemented in code                       |
+| Both-direction matching         | Implemented in code                       |
+| Match record structure          | Implemented in code                       |
+| View Matches UI                 | Implemented in code                       |
+| Notification functionality      | Implemented in code                       |
+| MongoDB persistence             | Not implemented in latest ZIP             |
+| Shared report integration       | Not verified                              |
+| Real-user automatic workflow    | Not verified                              |
+| Member 3 integration            | Bridge present; end-to-end testing needed |
+| Security and production cleanup | Still required                            |
+
+My recommendation: Your immediate priority should be MongoDB integration, not adding more matching features. Your current code already has a reasonable starting matching engine. Making it work with the real shared data is what will turn it into a functional Member 2 contribution.
+
+## Let's begin with one crucial decision
+
+I need to settle one thing before giving you code changes.
+
+1\. Which backend is your team actually using now?
+
+The latest TypeScript + Express project (the ZIP I just uploaded).
+
+The earlier Python + Flask project.
+
+Both versions exist, and we haven't combined them.
+
+I'm not sure.
+
+2\. Is this ZIP your complete team project or just your Member 2 working copy?
+
+Complete project shared by all three members.
+
+My Member 2 working copy only.
+
+I'm not sure.
+
+Continue with my implementation
+
+Once we establish this, we can work on the actual files in the correct order, without breaking Member 1's reporting or Member 3's recovery module.

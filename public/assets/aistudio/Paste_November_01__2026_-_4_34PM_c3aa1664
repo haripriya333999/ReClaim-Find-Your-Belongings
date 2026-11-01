@@ -1,0 +1,1891 @@
+Bro ❤️ Let's go through this properly, step by step. I want you to understand exactly what you, as Member 2, are responsible for, what is already available in your current ReClaim project, what is incorrect or incomplete, what needs to be modified, and how each change should work after implementation.
+
+I'm not going to tell you to rebuild features that already exist. We'll work with the current TypeScript + Express + MongoDB Atlas version of your project.
+
+The important distinction is:
+
+- Already implemented: The basic functionality and code structure exist.
+- Needs improvement: The functionality exists, but there are problems with accuracy, reliability, security or integration.
+- Needs testing: The code exists, but we haven't established that it works correctly with real Atlas data and the other members' modules.
+
+# 1. First, understand your complete responsibility as Member 2
+
+Your project is called ReClaim – Find Your Belongings.
+
+Imagine this situation:
+
+1. A student loses a black wallet in their college library.
+2. The student submits a LOST report.
+3. Another student finds a black wallet near the college library.
+4. That student submits a FOUND report.
+5. Your module compares these two reports.
+6. Your module calculates how closely they match.
+7. If the similarity is sufficient, your module creates a permanent match record.
+8. Your module notifies both students.
+9. Both students can view the possible match.
+10. Member 3 handles the ownership verification and recovery process.
+
+That entire middle section, from comparing the reports to notifying both users, is your responsibility.
+
+The complete ReClaim workflow
+
+Member 1 – Report Submission
+
+User submits a LOST or FOUND report with item details, date, location, description and image.
+
+Member 2 – Smart Matching & Item Discovery
+
+Compare reports → calculate similarity → identify possible matches → save match → notify both users.
+
+Member 3 – Verification & Recovery
+
+Verify ownership, manage the claim process and record successful recovery.
+
+ReClaim workflow completed
+
+The rightful owner recovers the belonging.
+
+Your work is not just calculating a percentage. You are responsible for making sure that the matching process works correctly from beginning to end.
+
+# 2. Understand what is already present in your current project
+
+Before making changes, you need to understand what you already have.
+
+| Component                   | Current situation                                |
+| --------------------------- | ------------------------------------------------ |
+| Matching algorithm          | Already implemented                              |
+| Six-criteria scoring system | Already implemented                              |
+| Automatic matching          | Already implemented                              |
+| Permanent match records     | Implemented, but needs correction                |
+| Notifications               | Implemented, but needs duplicate prevention      |
+| View Matches page           | Already implemented                              |
+| Match filters               | Already implemented                              |
+| Notification dropdown       | Already implemented                              |
+| Manual recalculation        | Implemented, but response mismatch exists        |
+| Member 3 integration        | Partially implemented, needs authorization fixes |
+| Matching unit tests         | Already implemented, needs expansion             |
+| Complete real-world testing | Not yet proven                                   |
+
+This means your job is to improve the existing implementation rather than replace it.
+
+Now let's discuss every change in detail.
+
+# 3. Change 1 – Improve the Smart Matching Algorithm
+
+High priority
+
+File: `matching/engine.ts`
+
+This is one of the most important files you own.
+
+The matching engine is responsible for determining whether a LOST report and a FOUND report might refer to the same physical belonging.
+
+Your current implementation already has six comparison criteria.
+
+## 3.1 Understand the existing scoring system
+
+The current weights are:
+
+Current matching score distribution
+
+Item name
+
+20%
+
+Category
+
+15%
+
+Colour
+
+15%
+
+Description
+
+20%
+
+Location
+
+20%
+
+Date
+
+10%
+
+Total
+
+# 100%
+
+These weights should remain unchanged initially.
+
+The reason is that you already have a scoring model. We should first improve how each criterion is compared, rather than changing the weights without evidence.
+
+### A. Item-name comparison – 20 points
+
+This checks whether the names of the LOST and FOUND items are similar.
+
+For example:
+
+| LOST report          | FOUND report   | Expected behaviour |
+| -------------------- | -------------- | ------------------ |
+| Black leather wallet | Leather wallet | Strong match       |
+| Samsung phone        | Samsung mobile | Strong match       |
+| Blue school bag      | Blue backpack  | Potential match    |
+| Black wallet         | Black shoes    | Weak match         |
+| Gold ring            | Silver chain   | Very weak match    |
+
+What is the current problem?
+
+A simple word-overlap algorithm can mistakenly give unrelated objects a good score because they share descriptive words.
+
+For example:
+
+- Black wallet
+- Black shoes
+
+Both contain the word `black`, but they are different types of belongings.
+
+What you should change:
+
+1. Normalize item names before comparison.
+2. Convert text to lowercase.
+3. Remove unnecessary punctuation and repeated spaces.
+4. Compare meaningful item-identifying words.
+5. Give greater importance to the main object name.
+6. Avoid treating common descriptive words as proof of item identity.
+7. Support common equivalent names such as `mobile` and `phone`, but only through a carefully maintained equivalence list.
+
+The goal is to distinguish the object itself from its characteristics.
+
+### B. Category comparison – 15 points
+
+This checks the category selected by the user.
+
+For example:
+
+- LOST: Electronics
+- FOUND: Electronics
+
+This should receive a strong score.
+
+But:
+
+- LOST: Electronics
+- FOUND: Clothing
+
+These should not receive a strong score.
+
+What needs changing?
+
+Your existing implementation already supports category comparison and special handling for `Other`.
+
+Improve it by:
+
+- Trimming leading and trailing spaces.
+- Normalizing capitalization.
+- Handling consistent category names.
+- Avoiding incorrect partial matches.
+- Treating missing or invalid categories safely.
+
+For example, `Electronics` and `electronics` should be treated as equivalent.
+
+However, `Electronic Accessories` and `Electronics` should not automatically be considered identical unless your team's category definitions explicitly support that relationship.
+
+### C. Colour comparison – 15 points
+
+This checks whether the reported colours are similar.
+
+Examples:
+
+| LOST      | FOUND    | Expected result     |
+| --------- | -------- | ------------------- |
+| Navy blue | Blue     | Similar             |
+| Dark blue | Blue     | Similar             |
+| Black     | White    | Not similar         |
+| Red       | Maroon   | Potentially similar |
+| Grey      | Charcoal | Potentially similar |
+
+Your existing engine already normalizes some colour families.
+
+What should change?
+
+Expand the existing normalization carefully.
+
+For example, you can maintain a controlled colour mapping:
+
+```
+const colorFamilies = {
+  blue: ["blue", "navy", "dark blue"],
+  red: ["red", "maroon"],
+  black: ["black", "dark charcoal"],
+  grey: ["grey", "gray", "charcoal"]
+};
+```
+
+This is an illustrative example, not a replacement for your current implementation.
+
+The important rule is that colour normalization should not make completely different colours equivalent.
+
+Also handle:
+
+- Empty colour fields.
+- Different capitalization.
+- Extra spaces.
+- Multiple colours, if your report format supports them.
+
+### D. Description comparison – 20 points
+
+Needs careful improvement
+
+This is particularly important because users often describe their belongings differently.
+
+For example:
+
+LOST description:
+
+"Black leather wallet containing college ID card and two bank cards."
+
+FOUND description:
+
+"Found a black leather wallet with an ID card and bank cards near the library."
+
+These reports contain several meaningful similarities.
+
+But consider:
+
+LOST description:
+
+"Blue backpack with college ID."
+
+FOUND description:
+
+"Black wallet containing college ID."
+
+Both descriptions contain `college` and `ID`.
+
+That does not mean they describe the same item.
+
+Your current code gives a minimum description contribution when it finds shared words. This can inflate the score for unrelated objects.
+
+What should you change?
+
+The description comparison should:
+
+1. Normalize the text.
+2. Remove common words that carry little identifying information.
+3. Identify meaningful shared terms.
+4. Compare multiple matching details instead of relying on one shared word.
+5. Give more importance to distinctive characteristics.
+6. Avoid rewarding generic words such as `item`, `found`, `college` and `near` too heavily.
+7. Handle empty descriptions safely.
+
+You should also test descriptions containing:
+
+- Brand names.
+- Model names.
+- Unique marks.
+- Stickers.
+- Scratches.
+- Patterns.
+- Contents inside bags or wallets.
+- Distinctive physical characteristics.
+
+Important: Do not claim that the algorithm identifies the same physical object with certainty. It identifies possible matches. Member 3 must still verify ownership.
+
+### E. Location comparison – 20 points
+
+Location is important because two similar items found in completely different places might not be related.
+
+Examples:
+
+- LOST: College Library
+- FOUND: Near College Library
+
+These should be considered similar.
+
+Another example:
+
+- LOST: Main Building, Second Floor
+- FOUND: Second Floor of Main Building
+
+These may also be similar.
+
+What needs changing?
+
+Your current algorithm already compares location tokens and removes some generic location words.
+
+Improve it so that meaningful place names are not accidentally removed.
+
+For example, don't remove the word `college` if it is part of an actual place name.
+
+The location normalizer should handle:
+
+- Capitalization.
+- Extra spaces.
+- Punctuation.
+- Common phrases such as `near`, `inside`, `outside`.
+- Equivalent word ordering.
+- Meaningful campus locations.
+- Missing locations.
+
+You should not assume that two locations are equivalent just because they contain the same generic word.
+
+### F. Date comparison – 10 points
+
+This checks the time difference between the LOST and FOUND reports.
+
+For example:
+
+- LOST: 1 November
+- FOUND: 1 November
+
+This is a strong date match.
+
+But:
+
+- LOST: 1 November
+- FOUND: 25 October
+
+This should receive a lower score.
+
+Your current engine already calculates date differences.
+
+What should you improve?
+
+Test these situations:
+
+| Date difference   | What to verify                                     |
+| ----------------- | -------------------------------------------------- |
+| Same date         | Highest date score                                 |
+| Within 24 hours   | Correct time-proximity score                       |
+| 2–3 days          | Lower score                                        |
+| 1 week            | Lower score                                        |
+| More than 2 weeks | Very low or zero score according to existing rules |
+| Invalid date      | No crash                                           |
+| Missing date      | Safe handling                                      |
+
+Also check timezone-related problems. Two timestamps representing nearby local dates should not accidentally be treated as several days apart because of inconsistent timezone conversion.
+
+## 3.2 Preserve the existing matching threshold
+
+Your current automatic matching code uses a threshold of 40%.
+
+That means the matching engine considers a report pair eligible for saving when its score reaches the configured threshold.
+
+For now:
+
+- Preserve the six existing weights.
+- Preserve the 40% threshold.
+- Improve the individual comparison methods.
+- Test the resulting scores using realistic examples.
+
+Later, if your team wants to change the threshold, compare false positives and missed matches before deciding.
+
+## 3.3 What should be completed in this file?
+
+Your final `matching/engine.ts` should:
+
+- Compare all six criteria correctly.
+- Normalize text consistently.
+- Avoid generic-word false positives.
+- Handle missing and invalid fields.
+- Reject invalid report combinations.
+- Reject same-user reports.
+- Reject non-OPEN reports.
+- Return the final score.
+- Return the individual criterion breakdown.
+- Produce predictable results for the same input.
+
+Expected output example:
+
+Possible match: Black leather wallet
+
+# 85/100
+
+Illustrative score only, not a result from your database.
+
+| Criterion   | Score |
+| ----------- | ----- |
+| Item name   | 18/20 |
+| Category    | 15/15 |
+| Colour      | 15/15 |
+| Description | 17/20 |
+| Location    | 12/20 |
+| Date        | 8/10  |
+
+Eligible for possible-match creation
+
+The result still requires ownership verification.
+
+# 4. Change 2 – Improve the Automatic Matching Workflow
+
+High priority
+
+File: `server.ts`
+
+This file connects Member 1's reporting functionality with your matching engine.
+
+Your current version already contains:
+
+```
+runMatchingForItem(newItem)
+```
+
+This function is called after the new report is inserted.
+
+That is the correct basic design.
+
+However, you need to make the process more reliable.
+
+## 4.1 Understand how automatic matching should work
+
+There are two possible situations.
+
+Situation A: Someone submits a LOST report.
+
+Suppose a user submits:
+
+```
+Report type: LOST
+Item: Black wallet
+Category: Accessories
+Colour: Black
+Location: College library
+Date: 1 November
+```
+
+Your backend should:
+
+1. Save the LOST report.
+2. Retrieve existing OPEN FOUND reports.
+3. Exclude FOUND reports belonging to the same user.
+4. Compare the new LOST report with each eligible FOUND report.
+5. Calculate the similarity score.
+6. Check whether each score reaches the configured threshold.
+7. Save eligible match records.
+8. Generate notifications for both users.
+
+Situation B: Someone submits a FOUND report.
+
+Suppose another user submits:
+
+```
+Report type: FOUND
+Item: Black leather wallet
+Category: Accessories
+Colour: Black
+Location: Near college library
+Date: 1 November
+```
+
+Your backend should:
+
+1. Save the FOUND report.
+2. Retrieve existing OPEN LOST reports.
+3. Exclude reports belonging to the same user.
+4. Compare the new FOUND report with each eligible LOST report.
+5. Calculate the similarity score.
+6. Check the threshold.
+7. Save eligible matches.
+8. Notify both users.
+
+Your automatic matching logic
+
+New report submitted
+
+Check report type
+
+LOST
+
+Search OPEN FOUND reports
+
+FOUND
+
+Search OPEN LOST reports
+
+Filter eligible reports and exclude the same user
+
+Calculate similarity score
+
+Does the score reach the threshold?
+
+No
+
+Do not create a match
+
+Yes
+
+Save match and notify both users
+
+Your current code already implements the basic two-direction process. The changes below make it more dependable.
+
+## 4.2 Fix the report-saving and matching error-handling problem
+
+This is one of the most important issues I found.
+
+Your current process is approximately:
+
+```
+Save uploaded image
+      ↓
+Insert report into MongoDB
+      ↓
+Run matching
+      ↓
+Return response
+```
+
+Consider this situation:
+
+- A user submits a FOUND report.
+- MongoDB successfully saves the report.
+- Your matching engine starts.
+- The database temporarily becomes unavailable during match creation.
+- Matching fails.
+- Your API returns an error for the entire report submission.
+
+The user sees an error even though their report was already saved.
+
+The user may submit the same report again.
+
+This can create duplicate reports.
+
+What should you change?
+
+Separate the result of report creation from the result of matching.
+
+Your backend should distinguish three situations:
+
+| Situation                          | Correct behaviour                                                |
+| ---------------------------------- | ---------------------------------------------------------------- |
+| Report insertion fails             | Return report-creation failure                                   |
+| Report saved and matching succeeds | Return report success and matching result                        |
+| Report saved but matching fails    | Return report success and indicate matching is pending or failed |
+
+The important point is that a matching error must not falsely tell the user that their already-saved report was not created.
+
+### Should matching run synchronously or in the background?
+
+For your current project, you can keep the existing synchronous matching flow initially, provided that matching failures are handled separately from report creation.
+
+For a more scalable future implementation, you could use a background job or retry queue.
+
+But don't introduce a complicated job system unless your team actually needs it.
+
+## 4.3 Fix orphaned images
+
+Your current report process saves an image before inserting the item.
+
+Suppose:
+
+1. The user uploads an image.
+2. The image is saved in MongoDB/GridFS.
+3. The report insertion fails.
+
+Now you have an image that is not associated with a valid report.
+
+This is called an orphaned image.
+
+What should change?
+
+If report insertion fails after the image has been saved:
+
+- Identify the uploaded image's stored ID.
+- Delete the newly created image record/file.
+- Return the appropriate report-creation error.
+- Do not delete an image that belongs to another report.
+
+This is a shared integration change. Coordinate it with Member 1 because the report-submission route belongs to the shared reporting workflow.
+
+## 4.4 Prevent invalid matches
+
+Your matching workflow must always enforce these rules:
+
+- LOST must match FOUND.
+- LOST must not match LOST.
+- FOUND must not match FOUND.
+- A user's own report must not match their other report.
+- Only OPEN reports should participate in new matching.
+- A match should only be created after the similarity threshold is met.
+
+Also ensure that matching both directions does not create two separate records for the same LOST/FOUND pair.
+
+Expected result: Every eligible pair should have one persistent match record, regardless of which report was submitted first.
+
+# 5. Change 3 – Correct Permanent Match Storage
+
+Critical database reliability fix
+
+File: `db/repository.ts`
+
+This file handles the database operations for your Member 2 module.
+
+Your current project already has a `matches` collection and an `upsertMatch()` function.
+
+That is good.
+
+But the existing upsert operation needs correction.
+
+## 5.1 First understand what a match record contains
+
+Suppose your system identifies a possible match between:
+
+- LOST report ID: `L101`
+- FOUND report ID: `F205`
+
+Your database should save a record similar to this:
+
+```
+{
+  "_id": "MATCH301",
+  "lostItemId": "L101",
+  "foundItemId": "F205",
+  "ownerId": "USER101",
+  "finderId": "USER205",
+  "score": 85,
+  "breakdown": {
+    "itemName": 18,
+    "category": 15,
+    "colour": 15,
+    "description": 17,
+    "location": 12,
+    "date": 8
+  },
+  "status": "PENDING",
+  "createdAt": "initial creation timestamp",
+  "updatedAt": "latest update timestamp"
+}
+```
+
+This is an illustrative record showing the existing data structure, not a real database entry.
+
+The important point is that the match record must be saved permanently.
+
+If the application restarts, the match must still be available.
+
+## 5.2 Understand the existing upsert problem
+
+Your current code performs an operation similar to:
+
+```
+updateOne(
+  {
+    lostItemId: match.lostItemId,
+    foundItemId: match.foundItemId
+  },
+  {
+    $set: match
+  },
+  {
+    upsert: true
+  }
+);
+```
+
+The problem is that the entire match object includes `_id`.
+
+MongoDB treats `_id` as immutable.
+
+You should not try to change an existing document's `_id` through `$set`.
+
+There is another problem: if a match already exists, recalculation should not unnecessarily replace its original creation information or reset its workflow status.
+
+## 5.3 What should change?
+
+Separate the match fields into two groups.
+
+Fields that should be set only when the match is first created:
+
+- `_id`
+- `lostItemId`
+- `foundItemId`
+- `createdAt`
+- Initial status, where appropriate
+
+Fields that can be updated:
+
+- `score`
+- `breakdown`
+- `updatedAt`
+
+The existing status needs special care.
+
+For example, suppose a match has already reached `CLAIM_IN_PROGRESS`.
+
+If the user clicks Recalculate Matches, the system must not accidentally reset it to `PENDING`.
+
+Similarly, recalculation must not erase a verification or recovery decision.
+
+Therefore:
+
+- Preserve the existing `_id`.
+- Preserve the original `createdAt`.
+- Preserve the existing workflow status unless a legitimate workflow transition changes it.
+- Update the score and breakdown according to your team's recalculation policy.
+- Maintain one record for each LOST/FOUND pair.
+
+Use MongoDB's `$setOnInsert` for creation-only fields and `$set` for permitted mutable fields.
+
+## 5.4 Handle simultaneous match creation
+
+Imagine two operations running almost simultaneously.
+
+Both discover the same possible wallet match.
+
+Both attempt to save it.
+
+Without appropriate protection, the operations can conflict.
+
+Your existing unique index on:
+
+```
+lostItemId + foundItemId
+```
+
+is important. Keep it.
+
+The upsert should be designed to work with that unique index, and duplicate-key errors caused by concurrent operations should be handled safely.
+
+Expected result:
+
+No matter how many times the matching function discovers the same report pair, there should be only one permanent match record for that pair.
+
+# 6. Change 4 – Prevent Duplicate Notifications
+
+High priority
+
+Files:
+
+- `db/repository.ts`
+- `db/mongo.ts`
+- `server.ts`
+
+Your current project already has notification functionality.
+
+The problem is preventing duplicate notifications.
+
+## 6.1 Understand the current notification behaviour
+
+Suppose the matching engine identifies a possible wallet match.
+
+Two users are involved:
+
+- USER101: Owner of the LOST report.
+- USER205: Finder of the FOUND report.
+
+Both should receive a notification.
+
+Example:
+
+Notification for the owner
+
+New
+
+Possible match found for your lost wallet
+
+A FOUND report has been identified that may match your lost item. Similarity: 85%.
+
+Notification for the finder
+
+New
+
+Your found wallet may match a LOST report
+
+A possible owner has been identified. Similarity: 85%.
+
+Each user should have their own notification record.
+
+## 6.2 What is wrong with the current implementation?
+
+Your current workflow is approximately:
+
+```
+Check whether notification exists
+             ↓
+If it does not exist
+             ↓
+Insert notification
+```
+
+This can fail under simultaneous requests.
+
+For example:
+
+1. Operation A checks whether the notification exists.
+2. Operation B checks whether the notification exists.
+3. Both find that it does not exist.
+4. Operation A inserts it.
+5. Operation B also inserts it.
+
+Now the user has duplicate notifications.
+
+## 6.3 What should change?
+
+Create a unique compound index using:
+
+```
+{ userId: 1, matchId: 1 }
+```
+
+This enforces the rule that a user should have only one notification for a particular match.
+
+Then change the insertion logic to use an atomic upsert or another duplicate-key-safe approach.
+
+Your current notification index is based on:
+
+```
+{ userId: 1, createdAt: -1 }
+```
+
+Keep this index if you need it for retrieving notifications by date.
+
+Add the separate unique index for notification identity.
+
+### Important: Why include both userId and matchId?
+
+Because two different users must receive notifications for the same match.
+
+For example:
+
+| userId  | matchId  | Allowed?       |
+| ------- | -------- | -------------- |
+| USER101 | MATCH301 | Yes            |
+| USER205 | MATCH301 | Yes            |
+| USER101 | MATCH301 | No – duplicate |
+| USER205 | MATCH301 | No – duplicate |
+
+The unique index should prevent duplicates for the same user and match, not prevent the second user from receiving their own notification.
+
+## 6.4 Notification creation must depend on successful match saving
+
+Your order should be:
+
+1. Calculate similarity.
+2. Save or confirm the permanent match record.
+3. Obtain the match ID.
+4. Create the owner's notification.
+5. Create the finder's notification.
+
+Do not notify users about a match that was never successfully saved.
+
+Also ensure that a notification failure does not silently destroy the permanent match record. Handle it separately and provide a way to retry notification creation if necessary.
+
+# 7. Change 5 – Correct Match Status Permissions and Member 3 Integration
+
+Critical security and integration fix
+
+Files:
+
+- `server.ts`
+- `db/repository.ts`
+- `frontend/js/matches.js`
+
+This is extremely important because your matching module connects directly to Member 3's verification module.
+
+## 7.1 Understand the current statuses
+
+Your existing project uses statuses such as:
+
+```
+PENDING
+CLAIM_IN_PROGRESS
+VERIFIED
+REJECTED
+CLOSED
+RECLAIMED
+```
+
+These represent different stages of a possible match.
+
+| Status            | Meaning                                   |
+| ----------------- | ----------------------------------------- |
+| PENDING           | Possible match identified                 |
+| CLAIM_IN_PROGRESS | Claim or verification process has started |
+| VERIFIED          | Ownership has been verified               |
+| REJECTED          | Claim or match has been rejected          |
+| CLOSED            | Match is no longer active                 |
+| RECLAIMED         | Belonging has been successfully recovered |
+
+Do not rename these statuses without discussing it with the other members.
+
+## 7.2 What is the current problem?
+
+Your current status API allows either the owner or finder to request several status values.
+
+That means a normal user could potentially submit:
+
+```
+{
+  "status": "VERIFIED"
+}
+```
+
+or:
+
+```
+{
+  "status": "RECLAIMED"
+}
+```
+
+This is not acceptable.
+
+A user must not be able to declare themselves the rightful owner just by changing the status.
+
+A similarity score is not proof of ownership.
+
+## 7.3 What should change?
+
+You need a proper status authorization policy.
+
+Here is a proposed policy to discuss with Member 3:
+
+| Action                          | Permission                                            |
+| ------------------------------- | ----------------------------------------------------- |
+| View match details              | Owner and finder                                      |
+| Start a claim                   | Authorized claimant, according to the agreed workflow |
+| Submit verification information | User involved in the claim                            |
+| Verify ownership                | Member 3's authorized verification workflow           |
+| Reject a claim                  | Authorized verification workflow                      |
+| Mark item as reclaimed          | Authorized recovery workflow                          |
+
+The exact claimant and rejection rules must be agreed with Member 3. The important rule is that ordinary users cannot directly set `VERIFIED` or `RECLAIMED`.
+
+## 7.4 Implement status transition validation
+
+You should not only check whether a requested status is one of the six allowed strings.
+
+You should also check whether the transition is permitted.
+
+For example:
+
+Example of a controlled match lifecycle
+
+1. PENDING
+
+   Possible match is saved and shown to both users.
+2. CLAIM_IN_PROGRESS
+
+   An authorized user initiates the claim process.
+3. VERIFIED
+
+   Member 3's authorized process confirms ownership.
+4. RECLAIMED
+
+   Recovery is completed and the item records are updated.
+
+This is a proposed workflow. Rejection and closure branches must be defined with Member 3.
+
+Your backend must reject invalid transitions even if someone manually sends an API request instead of using your frontend.
+
+Hiding a button in the frontend is not sufficient security.
+
+## 7.5 Ensure all related records are updated consistently
+
+Your current code updates the match and the two item records separately when a match becomes `RECLAIMED`.
+
+This creates a possible inconsistency.
+
+For example:
+
+- Match becomes RECLAIMED.
+- LOST item becomes RECLAIMED.
+- FOUND item update fails.
+
+Now the database contains inconsistent information.
+
+What should change?
+
+Prefer a MongoDB transaction where your Atlas deployment supports transactions.
+
+Within the same transaction:
+
+1. Validate the authorized transition.
+2. Update the match record.
+3. Update the LOST report.
+4. Update the FOUND report.
+5. Commit the transaction.
+
+If transactions are unavailable, implement a reliable recovery or retry strategy so partial updates can be detected and corrected.
+
+## 7.6 Coordinate with Member 3 before implementing
+
+You must ask Member 3:
+
+- Which exact status begins ownership verification?
+- Who is allowed to initiate a claim?
+- How does Member 3 verify ownership?
+- Who can reject a claim?
+- Who is allowed to mark an item as reclaimed?
+- Does Member 3 update the match record directly or call your API?
+- Which fields does Member 3 need from your match details endpoint?
+
+This coordination is necessary. You should not independently invent another verification system.
+
+# 8. Change 6 – Fix the Recalculate Matches Feature
+
+Required functional fix
+
+Files:
+
+- `server.ts`
+- `frontend/js/matches.js`
+
+Your current application already contains a manual Recalculate Matches feature.
+
+That means users or authorized administrators can trigger the matching process again.
+
+This is useful when:
+
+- New reports have been submitted.
+- The matching algorithm has been improved.
+- Existing matches need to be reconsidered.
+- An earlier matching operation failed.
+
+## 8.1 Understand the current bug
+
+Your frontend reads:
+
+```
+res.totalMatches
+```
+
+But your backend currently returns a response similar to:
+
+```
+{
+  "success": true,
+  "message": "Smart matching finished."
+}
+```
+
+There is no `totalMatches` property.
+
+Therefore, the frontend may display `undefined`.
+
+## 8.2 What should change?
+
+Make the backend return a consistent response.
+
+For example:
+
+```
+{
+  "success": true,
+  "message": "Matching completed.",
+  "totalMatches": 12
+}
+```
+
+The number 12 is only an example.
+
+The backend should return the actual total number of saved matches, not merely the number of pairs processed during the current recalculation.
+
+This distinction matters.
+
+Suppose your database already contains 15 matches.
+
+You run recalculation and discover 3 additional matches.
+
+The total saved matches should be 18, not 3.
+
+Also make sure:
+
+- Recalculation does not create duplicate match records.
+- It does not duplicate notifications.
+- It does not reset verified or reclaimed statuses.
+- It does not overwrite original creation timestamps.
+- It requires authentication and appropriate authorization.
+- The frontend displays the actual response.
+
+## 8.3 What should the frontend display?
+
+For example:
+
+Smart Matching
+
+Recheck eligible LOST and FOUND reports for possible matches.
+
+Saved matches
+
+# 18
+
+Recalculation completed
+
+Illustrative interface only.
+
+You do not need to rebuild the recalculation feature. Fix the backend/frontend response mismatch and verify its behaviour.
+
+# 9. Change 7 – Secure the Development Seed Endpoint
+
+Critical security fix
+
+File: `server.ts`
+
+Your current project contains:
+
+```
+POST /api/dev/seed
+```
+
+This endpoint is intended to insert demonstration data into your database.
+
+It may create:
+
+- Demo users.
+- LOST reports.
+- FOUND reports.
+- Images.
+- Match records.
+- Notifications.
+
+This is useful during development, but it must not be publicly available in production.
+
+## 9.1 What is the problem?
+
+The current endpoint is not adequately restricted.
+
+It does not require authentication or a development-only environment check.
+
+An unauthorized person could potentially call it and insert demonstration data into your actual database.
+
+Imagine your team has real users and reports in Atlas.
+
+Someone invokes the seed endpoint.
+
+Your database could then contain fake demonstration users and reports mixed with real data.
+
+That is not acceptable.
+
+## 9.2 What should change?
+
+Your endpoint should follow these rules:
+
+1. It must be disabled in production.
+2. It should only be available in explicitly configured development environments.
+3. It should require suitable protection even during development.
+4. It must never run automatically on server startup.
+5. Repeated seeding must not create duplicate records.
+6. Demo data must not interfere with real users or reports.
+
+Also review how demo images are inserted.
+
+Your current seed process can encounter duplicate-key errors when the same image records are inserted again.
+
+Make seeding idempotent: running it repeatedly should not create duplicate demo data.
+
+Expected result: Your team can still use demo data during controlled development, but the production application cannot be used to insert arbitrary demo records.
+
+# 10. Change 8 – Improve the Existing View Matches Page
+
+Files:
+
+- `frontend/view-matches.html`
+- `frontend/js/matches.js`
+
+Your current frontend already has a substantial amount of functionality.
+
+You do not need to create another View Matches page.
+
+Let's understand what you need to verify and improve.
+
+## 10.1 Match cards
+
+Your current page displays possible matches.
+
+Each match should show:
+
+- LOST item information.
+- FOUND item information.
+- LOST report image.
+- FOUND report image.
+- Item names.
+- Categories.
+- Colours.
+- Descriptions.
+- Locations.
+- Dates.
+- Similarity score.
+- Current match status.
+
+The important requirement is that these details must come from actual backend data.
+
+Do not use hardcoded demonstration values in the production interface.
+
+## 10.2 Similarity score display
+
+Your frontend should display the actual score returned by the backend.
+
+For example:
+
+Possible wallet match
+
+85% match
+
+LOST ITEM
+
+Black wallet
+
+College library
+
+FOUND ITEM
+
+Leather wallet
+
+Near library
+
+Similarity breakdown
+
+| Criterion   | Score |
+| ----------- | ----- |
+| Name        | 18/20 |
+| Category    | 15/15 |
+| Colour      | 15/15 |
+| Description | 17/20 |
+| Location    | 12/20 |
+| Date        | 8/10  |
+
+Illustrative values, not live project data.
+
+The frontend should not calculate a different score independently. The backend's matching engine should be the source of truth.
+
+## 10.3 Filters
+
+Your existing page supports:
+
+- Search.
+- Category filter.
+- Minimum score filter.
+- Status filter.
+
+You need to test whether these filters work correctly together.
+
+For example:
+
+A user selects:
+
+- Category: Electronics.
+- Minimum score: 70%.
+- Status: PENDING.
+
+The result should show only matches satisfying all three conditions.
+
+Also check:
+
+- Clearing filters restores the complete permitted list.
+- Search handles uppercase and lowercase text.
+- Empty results show an appropriate message.
+- Invalid filter values do not break the page.
+
+## 10.4 Match details modal
+
+Your existing modal displays additional match information.
+
+Verify that:
+
+- It opens the selected match.
+- It shows the correct LOST and FOUND reports.
+- It displays the correct score breakdown.
+- It does not accidentally display another user's private information.
+- It closes correctly.
+- It handles missing images or descriptions.
+
+## 10.5 Claim/verification button
+
+Your existing frontend already provides a button to initiate the claim/verification process.
+
+You must ensure that it:
+
+1. Checks whether the user is authorized to initiate the action.
+2. Sends the correct API request.
+3. Waits for the backend response.
+4. Displays success only after the backend confirms the change.
+5. Shows an error if the API rejects the request.
+6. Updates the match card with the actual new status.
+
+The frontend must never show a successful claim simply because a user clicked the button.
+
+# 11. Change 9 – Improve the Notifications Frontend
+
+File: `frontend/js/notifications.js`
+
+Your current notifications interface already includes:
+
+- Notification bell.
+- Dropdown.
+- Unread counter.
+- Notification list.
+- Mark one as read.
+- Mark all as read.
+- Navigation to View Matches.
+
+Your responsibility is to make it reliable.
+
+## 11.1 Keep the unread count synchronized
+
+Suppose the user has five unread notifications.
+
+The header should show:
+
+5
+
+Unread notifications
+
+The user opens the dropdown and marks one notification as read.
+
+The unread count should immediately become four.
+
+Do not wait for an unrelated page refresh.
+
+## 11.2 Refresh the notification list correctly
+
+Your existing polling mechanism refreshes the unread count periodically.
+
+However, the full notification list is not necessarily refreshed at the same time.
+
+Improve it so that:
+
+- The unread count remains accurate.
+- The notification list refreshes when the dropdown is open.
+- Marking one notification as read updates the corresponding item.
+- Marking all notifications as read updates the entire list.
+- Failed requests show an appropriate error.
+
+## 11.3 Avoid multiple polling intervals
+
+Your controller currently uses periodic polling.
+
+If the notification controller is initialized multiple times, it could accidentally create multiple intervals.
+
+That means:
+
+- Multiple requests could run every 25 seconds.
+- Unnecessary server requests could occur.
+- The UI could update repeatedly.
+
+Make sure only one active polling interval exists.
+
+Clear the interval when the relevant page or component is no longer active, according to the way your application manages page lifecycle.
+
+## 11.4 Verify notification navigation
+
+When a user clicks a notification, it should take them to the corresponding match.
+
+For example:
+
+```
+/ view-matches.html?matchId=MATCH301
+```
+
+The frontend should request the actual match from the backend.
+
+The backend must still verify that the logged-in user is either the owner or finder.
+
+A notification link is not authorization.
+
+# 12. Change 10 – Improve MongoDB Atlas and Repository Reliability
+
+Files:
+
+- `db/mongo.ts`
+- `db/repository.ts`
+
+These files are essential for your module because matches and notifications must be stored in MongoDB Atlas.
+
+## 12.1 Preserve the existing Atlas connection logic
+
+Your current project already:
+
+- Reads `MONGO_URI`.
+- Reads `DB_NAME`.
+- Reads `JWT_SECRET`.
+- Connects to MongoDB Atlas.
+- Performs an actual database ping.
+- Marks the database connected only after a successful ping.
+- Creates indexes.
+
+Keep this approach.
+
+Do not replace it with a fake connection-success message.
+
+## 12.2 Add the notification uniqueness index
+
+As explained earlier, your current notification index does not enforce one notification per user per match.
+
+Add the unique compound index:
+
+```
+{
+  userId: 1,
+  matchId: 1
+}
+```
+
+Before creating the unique index on an existing database, check whether duplicate records already exist.
+
+If duplicates exist, clean them up safely first. Otherwise, index creation can fail.
+
+## 12.3 Remove unsafe `0.0.0.0/0` advice
+
+I found this unsafe recommendation in your project.
+
+Some error messages recommend allowing:
+
+```
+0.0.0.0/0
+```
+
+This means allowing connections from every IPv4 address.
+
+That is not an appropriate default recommendation for your project.
+
+You should update the messages in:
+
+- `db/mongo.ts`
+- `db/repository.ts`
+- `frontend/js/api.js`
+
+Instead, tell developers to check their Atlas IP Access List and add the narrowest practical IP range needed for their development or deployment environment.
+
+Do not weaken the database's network restrictions just to make a connection work.
+
+## 12.4 Keep user-specific data access
+
+This is important for security.
+
+A user must only be able to retrieve:
+
+- Their own LOST/FOUND reports where permitted.
+- Matches in which they are the owner or finder.
+- Their own notifications.
+
+Your repository functions should continue enforcing the appropriate user-specific filters.
+
+For example, retrieving a match by its ID must not mean that any logged-in user can see it.
+
+# 13. Change 11 – Expand Your Matching Unit Tests
+
+Required before final integration
+
+File: `test/matching.test.ts`
+
+Your current project already has some unit tests.
+
+They cover:
+
+- High-similarity wallet.
+- Score components.
+- Same-user matching.
+- Unrelated items.
+- Closed/reclaimed reports.
+- Wrong report types.
+
+That is a good foundation.
+
+But the algorithm changes need additional tests.
+
+## 13.1 Matching engine tests
+
+Here are the tests I recommend adding.
+
+| Test                    | What it should verify                                   |
+| ----------------------- | ------------------------------------------------------- |
+| Exact item-name match   | Identical names produce the expected score              |
+| Partial item-name match | Similar names are handled correctly                     |
+| Generic word overlap    | Generic words do not create false matches               |
+| Different item types    | Wallet and shoes are not treated as similar objects     |
+| Category normalization  | Extra spaces and capitalization are handled             |
+| Colour variations       | Supported colour families are recognized                |
+| Different colours       | Unrelated colours are not incorrectly matched           |
+| Description similarity  | Meaningful shared details influence the score           |
+| Generic descriptions    | Common words do not inflate the score                   |
+| Location normalization  | Equivalent location descriptions are compared correctly |
+| Invalid date            | No crash or invalid score                               |
+| Missing date            | Safe handling                                           |
+| Same-user reports       | Rejected                                                |
+| LOST vs LOST            | Rejected                                                |
+| FOUND vs FOUND          | Rejected                                                |
+| Closed reports          | Rejected                                                |
+| Reclaimed reports       | Rejected                                                |
+
+## 13.2 Database and integration tests
+
+Unit tests alone cannot establish that Atlas persistence works.
+
+You also need integration tests.
+
+| Test                            | Expected result                           |
+| ------------------------------- | ----------------------------------------- |
+| New LOST against existing FOUND | Match is created when eligible            |
+| New FOUND against existing LOST | Match is created when eligible            |
+| Below-threshold pair            | No match created                          |
+| Duplicate pair                  | One match record only                     |
+| Concurrent matching             | One permanent match record only           |
+| Owner notification              | One notification created                  |
+| Finder notification             | One notification created                  |
+| Duplicate notification          | Prevented                                 |
+| Unrelated user access           | Rejected                                  |
+| Unauthorized verification       | Rejected                                  |
+| Unauthorized recovery           | Rejected                                  |
+| Recalculation                   | Returns actual saved match total          |
+| Production seed endpoint        | Unavailable                               |
+| Backend restart                 | Matches and notifications remain in Atlas |
+
+## 13.3 Do not confuse unit tests with complete project tests
+
+There are three different levels of testing.
+
+Level 1: Unit testing
+
+Test the matching algorithm independently.
+
+Example:
+
+```
+Input: LOST wallet report
+Input: FOUND wallet report
+Output: Similarity score and breakdown
+```
+
+Level 2: Backend integration testing
+
+Test whether your Express server correctly:
+
+- Retrieves reports.
+- Runs the matching engine.
+- Saves match records.
+- Creates notifications.
+- Updates statuses.
+
+Level 3: End-to-end testing
+
+Test the complete workflow using the actual application.
+
+Example:
+
+1. Register or log in as User A.
+2. Submit a LOST wallet report.
+3. Log in as User B.
+4. Submit a FOUND wallet report.
+5. Confirm that the matching engine identifies the possible match.
+6. Check that the match is saved in Atlas.
+7. Confirm that both users receive notifications.
+8. Open View Matches as User A.
+9. Open View Matches as User B.
+10. Initiate the verification workflow.
+11. Complete the authorized verification process with Member 3.
+12. Confirm the final recovery status and related report updates.
+
+Only after testing these stages can you say that the complete Member 2 workflow has been verified.
+
+# 14. Critical security issue: Your `.env` file
+
+Do this immediately
+
+I found that the ZIP you uploaded contained a populated `.env` file.
+
+That file contains sensitive configuration values.
+
+It is not just an ordinary project file.
+
+It can contain:
+
+- MongoDB Atlas connection credentials.
+- Database name.
+- JWT signing secret.
+- Server configuration.
+
+I will not repeat any of those values here.
+
+## What you must do
+
+1. Remove `.env` from the ZIP you distribute.
+2. Make sure `.env` is not committed to GitHub.
+3. Rotate the exposed Atlas database password.
+4. Generate a new JWT secret.
+5. Update your private local configuration and deployment environment variables.
+6. Check whether `.env` was committed in previous Git history.
+7. If it was, address the historical exposure as well; deleting the latest copy is not enough.
+8. Keep `.env.example` with placeholder values only.
+
+For example, `.env.example` can contain:
+
+```
+MONGO_URI=your_mongodb_connection_string
+DB_NAME=your_database_name
+JWT_SECRET=replace_with_a_secure_random_secret
+PORT=3000
+```
+
+Do not paste your new credentials into ChatGPT or commit them to your repository.
+
+Also confirm the actual shared database name with Member 1. Your current code has a default value, but that does not prove that it is the database your entire team is using.
+
+# 15. Exact file-by-file implementation guide
+
+Now let's put everything together so you know which file to open and what to do inside it.
+
+| File                           | Exact responsibility                                                                                                                                   |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `matching/engine.ts`           | Improve all six comparison methods, normalization, invalid-data handling and score breakdown                                                           |
+| `server.ts`                    | Correct automatic matching, report/matching error handling, image cleanup coordination, status permissions, recalculation response and seed protection |
+| `db/repository.ts`             | Fix atomic match upsert, preserve existing status and creation data, prevent duplicate notifications, enforce user-specific access                     |
+| `db/mongo.ts`                  | Add notification unique index, retain Atlas ping, handle existing duplicates and remove unsafe network advice                                          |
+| `test/matching.test.ts`        | Expand scoring and validation tests                                                                                                                    |
+| `frontend/js/matches.js`       | Fix recalculation response handling, claim workflow, loading/error states and accurate match display                                                   |
+| `frontend/view-matches.html`   | Check existing match cards, details modal, filters and status display                                                                                  |
+| `frontend/js/notifications.js` | Synchronize notification list and unread count, prevent duplicate polling and handle errors                                                            |
+| `frontend/js/api.js`           | Correct database connection guidance and ensure accurate API error handling                                                                            |
+| `.env`                         | Remove from ZIP/Git, rotate exposed credentials                                                                                                        |
+| `.env.example`                 | Keep safe placeholders only                                                                                                                            |
+
+# 16. What you should discuss with the other two members
+
+Your work is connected to the other members. You should not make changes that silently break their modules.
+
+Here is exactly what you need to coordinate.
+
+With Member 1 – Reporting
+
+Ask:
+
+1. Are LOST and FOUND reports using the same field names in the shared database?
+2. Are `reportType`, `status`, `userId`, `category`, `colour`, `description`, `location` and `date` consistent?
+3. How are uploaded images stored?
+4. What is the image ID field?
+5. Can the report API distinguish report-saving failure from matching failure?
+6. Which Atlas database and collection names are being used?
+
+Your integration requirement: Your matching engine must use the actual report data created by Member 1, not a separate invented report structure.
+
+With Member 3 – Verification and Recovery
+
+Ask:
+
+1. What is the exact verification workflow?
+2. Which statuses does Member 3 use?
+3. Who can initiate a claim?
+4. Who can approve or reject ownership?
+5. Which API should be called to complete verification?
+6. Who updates the LOST and FOUND item statuses?
+7. Which match details does Member 3 require?
+
+Your integration requirement: Your matching system should create and expose possible matches, but must not bypass Member 3's ownership verification.
+
+With the whole team
+
+Confirm:
+
+- One shared MongoDB Atlas database.
+- One agreed report schema.
+- One agreed match-status lifecycle.
+- One agreed API contract.
+- One common authentication mechanism.
+- No member independently changing shared fields without coordination.
+
+# 17. The correct order in which you should complete the work
+
+Bro, don't open all these files and start changing random things. Follow this sequence.
+
+Member 2 progress tracker
+
+# 0/37
+
+Tick each task only after you have actually completed and checked it.
+
+Phase 1 – Secure the project
+
+Remove .env from the ZIP and Git tracking.
+
+Rotate exposed Atlas credentials and JWT secret.
+
+Check Git history for exposed credentials.
+
+Restrict the development seed endpoint.
+
+Remove unsafe 0.0.0.0/0 guidance.
+
+Phase 2 – Improve the matching engine
+
+Understand the existing six scoring functions.
+
+Improve item-name comparison.
+
+Improve category and colour normalization.
+
+Improve description and location comparison.
+
+Handle invalid and missing dates.
+
+Expand matching unit tests.
+
+Phase 3 – Fix automatic matching
+
+Verify both LOST-first and FOUND-first matching.
+
+Check report ownership and OPEN status.
+
+Separate report creation success from matching failure.
+
+Coordinate image cleanup with Member 1.
+
+Prevent duplicate matching operations.
+
+Phase 4 – Fix database persistence
+
+Correct upsertMatch and immutable \_id handling.
+
+Preserve original creation time and workflow status.
+
+Handle concurrent match creation.
+
+Add the unique notification index.
+
+Prevent duplicate notifications safely.
+
+Phase 5 – Integrate Member 3
+
+Agree on status transitions.
+
+Restrict VERIFIED and RECLAIMED permissions.
+
+Validate every requested transition on the backend.
+
+Keep match and item statuses consistent.
+
+Test Member 3's actual verification workflow.
+
+Phase 6 – Fix frontend and APIs
+
+Fix totalMatches response mismatch.
+
+Verify View Matches data and filters.
+
+Verify claim button behaviour.
+
+Synchronize notification list and unread count.
+
+Prevent duplicate polling intervals.
+
+Improve loading and error states.
+
+Phase 7 – Test and submit
+
+Run unit tests.
+
+Run backend integration tests against a test database.
+
+Run the complete two-user workflow.
+
+Verify Atlas persistence after restart.
+
+Review changes and open a pull request from member2-matching.
+
+Reset checklist
+
+# 18. What you should NOT change
+
+This is just as important as knowing what to change.
+
+Do not:
+
+1. Rebuild the matching engine from scratch.
+2. Create another matches collection.
+3. Create another notification system.
+4. Create another View Matches page.
+5. Change the six scoring weights without testing.
+6. Change the 40% threshold without team agreement.
+7. Rename report fields without coordinating with Member 1.
+8. Independently redesign Member 3's verification process.
+9. Allow normal users to approve their own ownership.
+10. Replace real Atlas data with hardcoded demo records.
+11. Claim that matching works because an API returns HTTP 200.
+12. Claim that the module is complete without testing the entire workflow.
+
+Your responsibility is to improve the existing shared application without breaking the work of the other two members.
+
+# 19. What should your final Member 2 module look like?
+
+When you finish, the expected functionality should be as follows.
+
+## Final Member 2 deliverable
+
+1\. Accurate smart matching
+
+Required
+
+The six criteria compare LOST and FOUND reports and generate reliable scores with breakdowns.
+
+2\. Automatic match discovery
+
+Required
+
+New LOST and FOUND reports trigger the correct opposite-report comparison.
+
+3\. Permanent match storage
+
+Required
+
+Each eligible report pair has one reliable match record in Atlas.
+
+4\. Notifications for both users
+
+Required
+
+The owner and finder receive their own notifications without duplicates.
+
+5\. View Matches
+
+Required
+
+Both authorized users can view the correct match, score, details and status.
+
+6\. Recalculation
+
+Required
+
+Matching can be recalculated without duplicating records or resetting workflow statuses.
+
+7\. Secure Member 3 integration
+
+Required
+
+Your module exposes possible matches while respecting verification and recovery permissions.
+
+8\. Reliable database and security
+
+Required
+
+Atlas persistence, access control, duplicate prevention and environment security are verified.
+
+# 20. My final assessment and recommendation
+
+I would divide your remaining work into three levels.
+
+| Priority | Work                                                                  | Why                               |
+| -------- | --------------------------------------------------------------------- | --------------------------------- |
+| Critical | `.env` exposure, seed endpoint, status authorization                  | Security and user-data protection |
+| High     | Match upsert, notification uniqueness, report/matching error handling | Data reliability                  |
+| High     | Matching algorithm improvements and tests                             | Match accuracy                    |
+| High     | Member 3 integration                                                  | Correct recovery workflow         |
+| Medium   | Recalculation response and frontend synchronization                   | Correct user experience           |
+| Final    | Real Atlas and end-to-end testing                                     | Evidence that everything works    |
+
+One important limitation: This assessment is based on the source code in the latest ZIP that I inspected. I have not run the project against your live MongoDB Atlas database, installed and executed its test suite, or verified the complete workflow using real accounts. So the existing features are identified from code, not certified as working in production.
+
+## What I recommend we do next
+
+Bro, I don't want you to make all these changes blindly or accidentally damage the existing project.
+
+The best approach is to take one phase at a time, starting with Phase 1 and then moving to the matching engine.
+
+For every phase, we can work through:
+
+1. The exact existing code and what it currently does.
+2. The actual problem in that code.
+3. What the corrected implementation should do.
+4. The exact changes needed in the file.
+5. How to test the change.
+6. What result you should expect before moving to the next phase.
+
+That way, you will not only complete your Member 2 responsibilities, but you will also understand your own implementation well enough to explain it during your project demonstration and evaluation.
