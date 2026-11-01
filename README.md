@@ -1,87 +1,118 @@
-<<<<<<< HEAD
-# ReClaim – Member 1 (Lost & Found Reporting)
+# ReClaim – Find Your Belongings
 
-A beginner-friendly project using HTML, CSS, Vanilla JavaScript, Python Flask and MongoDB Atlas.
+## About the Project
+ReClaim is a web-based Lost and Found application that helps users report lost or found items and search for belongings reported by others.
 
-## Features
-- User registration and login with hashed passwords and JWT authentication.
-- Create LOST and FOUND reports.
-- Upload PNG/JPG/JPEG/WEBP item photographs (maximum 5 MB).
-- Store photographs in MongoDB GridFS so teammates can retrieve them through the same backend.
-- Browse open reports and filter by report type/search text.
-- View the logged-in user's reports.
-- Shared REST API for Member 2's matching module.
+## Technologies Used
+- **Frontend:** HTML, CSS, JavaScript
+- **Backend:** Python, Flask
+- **Database:** MongoDB Atlas
+- **Tools:** VS Code, Git, GitHub
+- **Environment:** Python Virtual Environment
 
-## 1. Requirements
-- Python 3.10 or newer
-- MongoDB Atlas account and database user
-- Internet connection for Atlas access
+## Project Structure
 
-## 2. Create and activate a virtual environment
-Open a terminal in the `ReClaim` project root.
-
-Windows PowerShell:
-```powershell
-py -m venv .venv
-.\.venv\Scripts\Activate.ps1
+```text
+reclaim_project/
+│
+├── backend/
+│
+├── frontend/
+│   ├── css/
+│   │   └── style.css
+│   │
+│   ├── js/
+│   │   ├── api.js
+│   │   ├── auth.js
+│   │   ├── dashboard.js
+│   │   ├── find-items.js
+│   │   ├── my-reports.js
+│   │   └── report.js
+│   │
+│   ├── index.html
+│   ├── login.html
+│   ├── register.html
+│   ├── dashboard.html
+│   ├── find-items.html
+│   ├── my-reports.html
+│   ├── report-lost.html
+│   └── report-found.html
+│
+├── .env
+├── .gitignore
+├── requirements.txt
+├── run.py
+└── README.md
 ```
 
-Windows Command Prompt:
-```cmd
-py -m venv .venv
-.venv\Scripts\activate.bat
-```
+## How the Application is Connected
 
-macOS/Linux:
+1. **Frontend:** HTML is used to create web pages, CSS for styling, and JavaScript for interactions.
+2. **API Connection:** `api.js` handles communication between the frontend and backend through API requests.
+3. **Backend:** Python Flask handles API requests and application logic.
+4. **Database:** MongoDB Atlas stores user information and lost/found item reports.
+5. **Configuration:** The `.env` file stores environment variables and database connection details.
+6. **Dependencies:** `requirements.txt` contains the Python packages required to run the project.
+
+## Steps to Clone and Run the Project
+
+### 1. Clone the Repository
+
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate
+git clone https://github.com/haripriya333999/ReClaim-Find-Your-Belongings.git reclaim_project
 ```
 
-## 3. Install packages
+### 2. Open the Project Folder
+
 ```bash
-python -m pip install --upgrade pip
+cd reclaim_project
+```
+
+### 3. Create a Virtual Environment
+
+```bash
+python -m venv .venv
+```
+
+### 4. Activate the Virtual Environment (Windows)
+
+```bash
+.venv\Scripts\activate
+```
+
+### 5. Install Required Packages
+
+```bash
 pip install -r requirements.txt
 ```
 
-## 4. Configure environment
-Copy `.env.example` to `.env` in the project root. Put your Atlas connection URI in `MONGO_URI`, set `DB_NAME=reclaim_db`, and create a long random `JWT_SECRET` (at least 32 characters). URL-encode special characters in the Atlas database password (for example `@` becomes `%40`). Never commit `.env` to GitHub.
+### 6. Configure Environment Variables
 
-## 5. Configure Atlas network access
-In Atlas, add the public IP address of the computer running the backend under Network Access. The Atlas database user must have read/write access to the database. Do not use the Atlas website login as the database username.
+Create a `.env` file in the root directory and add the required configuration, including your MongoDB Atlas connection details.
 
-## 6. Run the app
-From the project root, with `.venv` activated:
+### 7. Run the Application
+
 ```bash
 python run.py
 ```
-Open http://127.0.0.1:5000 in your browser. Do not open the HTML files directly or use a separate static Live Server; Flask serves the frontend and API from the same origin.
 
-Check http://127.0.0.1:5000/api/health to confirm the backend can reach Atlas.
+## Current Implementation
 
-## Member 2 API contract
-All item API routes below require `Authorization: Bearer <JWT>`.
+- User registration and login
+- Dashboard
+- Lost item reporting
+- Found item reporting
+- Item searching and filtering
+- Viewing personal reports
+- MongoDB Atlas integration
 
-- `GET /api/items?reportType=LOST&status=OPEN` – get open lost reports.
-- `GET /api/items?reportType=FOUND&status=OPEN` – get open found reports.
-- `GET /api/items` – get reports (up to 200, newest first).
-- `GET /api/items/<item_id>` – get one report.
-- `GET /api/items/my-reports` – get the current user's reports.
+## Important Notes
 
-The item response includes `_id`, `userId`, `reportType`, `itemName`, `category`, `description`, `color`, `location`, `date`, `imageUrl`, `status`, `createdAt`, and `updatedAt`. Member 2 must save the actual `_id` as `lostItemId` or `foundItemId` in a match document. Image URLs are served by this same Flask backend.
+- Python must be installed before setting up the project.
+- Each person should create their own virtual environment.
+- The `.env` file should be configured locally and should not contain publicly shared credentials.
+- The `.venv` folder and sensitive environment files should not be uploaded to GitHub.
 
-Create a report with `POST /api/items` using `multipart/form-data` fields `reportType`, `itemName`, `category`, `description`, `color`, `location`, `date`, and `image`.
+## Project Status
 
-## Important team integration notes
-- Use one shared Atlas database and one deployed backend/API base URL for the team when you move beyond local development.
-- Each teammate's computer must not run an independent copy of the database if the goal is shared live data.
-- For local testing on different laptops, each developer needs their public IP allowed in Atlas and must point to the same database. For actual integrated use, deploy the Flask backend so teammates share one API URL.
-- This module allows a user to update only their own report status. Before Member 3's recovery module is integrated, the team should agree on a trusted role/service authorization for recovery-driven status changes; do not expose an unauthenticated status update.
-- Do not store real personal contact details or sensitive identifying information in item descriptions.
-
-## Current scope
-This is Member 1's reporting module. The `matches` and `claims` collections are intentionally left for Members 2 and 3 to implement using the shared item IDs and contract.
-=======
-# ReClaim-Find-Your-Belongings
-A centralized digital lost-and-found platform that helps people reconnect with their lost belongings.
->>>>>>> 7d9259fdb32124fad11ba938e13d56fa54ff5566
+The basic application structure, frontend and backend integration, user authentication, item reporting, searching, and database connectivity have been implemented. This README will be updated as the project progresses.
