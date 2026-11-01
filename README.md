@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # ReClaim – Member 1 (Lost & Found Reporting)
 
 A beginner-friendly project using HTML, CSS, Vanilla JavaScript, Python Flask and MongoDB Atlas.
@@ -80,3 +81,7 @@ Create a report with `POST /api/items` using `multipart/form-data` fields `repor
 
 ## Current scope
 This is Member 1's reporting module. The `matches` and `claims` collections are intentionally left for Members 2 and 3 to implement using the shared item IDs and contract.
+=======
+# ReClaim-Find-Your-Belongings
+A centralized digital lost-and-found platform that helps people reconnect with their lost belongings.
+>>>>>>> 7d9259fdb32124fad11ba938e13d56fa54ff5566
