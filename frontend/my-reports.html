@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>My reports | ReClaim</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <script defer src="/js/api.js"></script>
+    <script defer src="/js/notifications.js"></script>
+    <script defer src="/js/my-reports.js"></script>
+</head>
+<body>
+    <header class="topbar">
+        <a class="brand" href="/">Re<span>Claim</span></a>
+        <nav>
+            <a href="/dashboard.html">Dashboard</a>
+            <a href="/find-items.html">Find items</a>
+            <a href="/view-matches.html">View matches</a>
+            <a href="/my-reports.html" class="active" style="color:var(--green-dark);font-weight:700">My reports</a>
+            <button class="link-button" id="logoutButton">Logout</button>
+        </nav>
+    </header>
+
+    <main class="wrap page fade-in">
+        <span class="eyebrow">YOUR ACTIVITY</span>
+        <h1>My reports</h1>
+        <p class="muted">View the lost and found reports submitted through your account.</p>
+        
+        <div id="myReportsContainer" class="item-grid stagger-1">
+            <p class="muted">Loading your reports…</p>
+        </div>
+    </main>
+</body>
+</html>

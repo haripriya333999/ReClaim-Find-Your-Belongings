@@ -1,0 +1,31 @@
+# Dependencies
+node_modules/
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Backup and archive files
+*.zip
+*.rar
+*.7z
+*.tar
+*.gz
+*.bak
+*.backup
+
+# Build output
+dist/
+build/
+coverage/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Logs and OS files
+*.log
+.DS_Store
+.idea/
+.vscode/

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Find items | ReClaim</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <script defer src="/js/api.js"></script>
+    <script defer src="/js/notifications.js"></script>
+    <script defer src="/js/find-items.js"></script>
+</head>
+<body>
+    <header class="topbar">
+        <a class="brand" href="/">Re<span>Claim</span></a>
+        <nav>
+            <a href="/dashboard.html">Dashboard</a>
+            <a href="/find-items.html" class="active" style="color:var(--green-dark);font-weight:700">Find items</a>
+            <a href="/view-matches.html">View matches</a>
+            <a href="/my-reports.html">My reports</a>
+            <button class="link-button" id="logoutButton">Logout</button>
+        </nav>
+    </header>
+
+    <main class="wrap page fade-in">
+        <span class="eyebrow">COMMUNITY REPORTS</span>
+        <h1>Find an item</h1>
+        <p class="muted">Browse reports submitted by ReClaim users.</p>
+        
+        <div class="toolbar panel">
+            <label class="filter-label">Report type
+                <select id="typeFilter">
+                    <option value="">All reports</option>
+                    <option value="LOST">Lost items</option>
+                    <option value="FOUND">Found items</option>
+                </select>
+            </label>
+            <label class="filter-label">Search
+                <input id="searchInput" type="search" placeholder="Search name, colour, category…">
+            </label>
+        </div>
+
+        <div id="itemsContainer" class="item-grid stagger-2">
+            <p class="muted">Loading reports…</p>
+        </div>
+    </main>
+</body>
+</html>
